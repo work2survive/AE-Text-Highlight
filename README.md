@@ -1,4 +1,4 @@
-# AE Text Highlight (v1.1.2)
+# AE Text Highlight (v1.1.3)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -14,6 +14,11 @@
 ---
 
 ## ✨ Features & What's New
+
+### 🚀 What's New in v1.1.3
+- **Fixed `ReferenceError: Object is invalid`**: Completely restructured layer lifecycle and reordering order. In Adobe After Effects ExtendScript, modifying layer stack order (`moveAfter()`, `moveToEnd()`) shifts composition indices, which invalidates pre-existing C++ layer pointers. By configuring all properties, vector groups, and parenting *before* reordering, and re-querying layer references by name, the `Object is invalid` error is completely eliminated.
+- **Robust TextDocument Inspector**: Added safe `getTextLayerDocument()` and `getTextLayerString()` helpers to accurately read font size, font family, and text content directly from After Effects DOM across all AE versions.
+- **Detailed Error Reporting**: Upgraded catch alerts to report the exact script line number (`err.line`) if any unexpected exception ever occurs.
 
 ### 🚀 What's New in v1.1.2
 - **ExtendScript ES3 Compatibility Fix**: Added a robust ES3-safe `trimStr()` helper and polyfills for `String.prototype.trim` and `Array.prototype.indexOf`. Resolves the `Function String().replace().trim is undefined` runtime alert dialog thrown by Adobe After Effects' legacy ES3 engine.
