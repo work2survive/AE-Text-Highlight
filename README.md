@@ -1,4 +1,4 @@
-# AE Text Highlight (v1.1.1)
+# AE Text Highlight (v1.1.2)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -13,7 +13,12 @@
 
 ---
 
-## ✨ Features & What's New in v1.1
+## ✨ Features & What's New
+
+### 🚀 What's New in v1.1.2
+- **ExtendScript ES3 Compatibility Fix**: Added a robust ES3-safe `trimStr()` helper and polyfills for `String.prototype.trim` and `Array.prototype.indexOf`. Resolves the `Function String().replace().trim is undefined` runtime alert dialog thrown by Adobe After Effects' legacy ES3 engine.
+- **Parent & Link Coordinates**: Automatically links highlight shape layers to the text layer and cancels parent anchor point / position offsets via composition space coordinate transforms (`thisLayer.fromComp(txtLayer.toComp(...))`).
+- **Offset X & Offset Y Controls**: Master sliders for fine-tuning placement directly from the Effect Controls panel or ScriptUI window.
 
 ### 1. Sub-Pixel Precision & Zero Cumulative Offset
 - **Exact Measurement Engine**: Replaced rough glyph estimates with a sub-pixel Canvas 2D measurement stack (`document.createElement('canvas').getContext('2d')`) matching the browser's SVG font engine.
