@@ -1,4 +1,4 @@
-# AE Text Highlight (v1.1.4)
+# AE Text Highlight (v1.2.1)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -15,37 +15,24 @@
 
 ## ✨ Features & What's New
 
-### 🚀 What's New in v1.1.4
-- **Precision Alignment & Typography Injection**: Baked detected font size, font family, justification, and leading directly into procedural expressions as baseline constants. In AE projects using the Legacy ExtendScript expression engine where `sourceText.style` is unavailable, expressions previously defaulted to 34px Georgia with Left alignment, causing systematic offsets when the text layer had different font sizes (e.g. 22px) or Center/Right alignment.
-- **Line Break Normalization (`\r\n` / `\r` / `\n`)**: Normalized all line breaks before index mapping so character pointers and line starts never drift across multi-line paragraphs.
-- **Calibrated Typographic Metric Tables**: Integrated exact sub-pixel advance width ratios for Trebuchet MS, Arial, Georgia, Times New Roman, Verdana, Impact, and Courier New.
-- **Multi-Line Sentence Wrapping**: Supported matching and highlighting phrases across line breaks without offsets.
+### 🚀 What's New in v1.2.1
+- **Fixed `currentOffsetX is undefined` Runtime Bug (line 838)**: Passed `offsetX` and `offsetY` directly into `createHighlightGroups` with safe numerical fallbacks, eliminating the ExtendScript alert thrown when building highlights.
+- **Removed All Background Options**: Completely removed Background Plate controls, presets, and layer generation logic per user specification. No background solid or shape layer is created; only procedural highlight blocks parented to the text layer are generated.
 
-### 🚀 What's New in v1.1.3
-- **Fixed `ReferenceError: Object is invalid`**: Completely restructured layer lifecycle and reordering order. In Adobe After Effects ExtendScript, modifying layer stack order (`moveAfter()`, `moveToEnd()`) shifts composition indices, which invalidates pre-existing C++ layer pointers. By configuring all properties, vector groups, and parenting *before* reordering, and re-querying layer references by name, the `Object is invalid` error is completely eliminated.
-- **Robust TextDocument Inspector**: Added safe `getTextLayerDocument()` and `getTextLayerString()` helpers to accurately read font size, font family, and text content directly from After Effects DOM across all AE versions.
-- **Detailed Error Reporting**: Upgraded catch alerts to report the exact script line number (`err.line`) if any unexpected exception ever occurs.
-
-### 🚀 What's New in v1.1.2
-- **ExtendScript ES3 Compatibility Fix**: Added a robust ES3-safe `trimStr()` helper and polyfills for `String.prototype.trim` and `Array.prototype.indexOf`. Resolves the `Function String().replace().trim is undefined` runtime alert dialog thrown by Adobe After Effects' legacy ES3 engine.
-- **Parent & Link Coordinates**: Automatically links highlight shape layers to the text layer and cancels parent anchor point / position offsets via composition space coordinate transforms (`thisLayer.fromComp(txtLayer.toComp(...))`).
-- **Offset X & Offset Y Controls**: Master sliders for fine-tuning placement directly from the Effect Controls panel or ScriptUI window.
+### 🚀 What's New in v1.2.0
+- **Modern Tabbed Interface**: Redesigned ScriptUI Panel into two clean tabs matching Suite UX standards:
+  - **📝 Text Box**: Target text layer detection, dummy text generator & multi-attribute randomizer (Font, Alignment, Box Width, Indent), and highlight target input (multiline textarea with quick-action buttons).
+  - **🎨 Appearance**: Thickness Y, Padding X, Roundness, Offset X/Y, and Highlight Color & Opacity with color swatches.
+- **Curated Styling Presets**: Quick dropdown with curated looks (*Hot Pink*, *Neon Mint*, *Golden Glow*, *Electric Cyan*, *Lavender Dream*, *Slow Living Demo*).
+- **ExtendScript Property Group Invalidation Fix**: Precomputed geometry and fully configured vector shapes before attaching expressions to prevent `Object is invalid` errors.
 
 ### 1. Sub-Pixel Precision & Zero Cumulative Offset
-- **Exact Measurement Engine**: Replaced rough glyph estimates with a sub-pixel Canvas 2D measurement stack (`document.createElement('canvas').getContext('2d')`) matching the browser's SVG font engine.
-- **Zero Drift**: Eliminates the cumulative position error so words deep into long lines (or at the very end of sentences) are centered with 100% precision.
-- **Calibrated Fallback**: Includes fractional font metric tables for desktop After Effects ExtendScript when running outside browser environments.
+- **Exact Measurement Engine**: Sub-pixel Canvas 2D measurement stack (`document.createElement('canvas').getContext('2d')`) matching the browser's SVG font engine and calibrated fallback metric tables for desktop After Effects ExtendScript.
+- **Zero Drift**: Eliminates cumulative position error so words deep into long lines (or at the very end of sentences) are centered with 100% precision.
 
 ### 2. Procedural Dummy Text Generation & Multi-Attribute Randomization
 - When **no text layer is selected**, running the tool creates a ~100-word *"Lorem ipsum dolor sit amet..."* dummy text layer and randomizes:
-  - **Font**: Selected from typical system fonts available on every computer:
-    - `Georgia` (Serif)
-    - `Arial` (Clean Sans)
-    - `Times New Roman` (Classic Serif)
-    - `Verdana` (Wide Sans)
-    - `Trebuchet MS` (Modern Sans)
-    - `Courier New` (Monospace)
-    - `Impact` (Condensed Bold)
+  - **Font**: Selected from typical system fonts (`Georgia`, `Arial`, `Times New Roman`, `Verdana`, `Trebuchet MS`, `Courier New`, `Impact`).
   - **Alignment**: `Left`, `Center`, or `Right` justification.
   - **Text Box Width**: Randomly chosen (700px – 1200px) with procedural word wrapping to fit the exact width.
   - **First-Line Indent**: Randomly applied (0px, 24px, 48px, 72px).
@@ -53,7 +40,7 @@
 - **One-Click Randomization**: Use the *"🎲 Randomize Dummy & Layout"* button in the ScriptUI panel to re-roll fonts, widths, indents, and alignments at any time.
 
 ### 3. Real-Time Procedural Rigging
-- **True Stacking Order**: Highlight blocks are generated on a dedicated vector Shape Layer placed **directly below** the text layer and above the background plate.
+- **True Stacking Order**: Highlight blocks are generated on a dedicated vector Shape Layer placed **directly below** the text layer.
 - **Transformation Parenting**: The shape layer is parented to the text layer (`shapeLayer.parent = textLayer`). Moving, scaling, rotating, or animating the text layer carries the highlight blocks in lockstep.
 - **Dynamic Expression Engine**: Each highlight box's `Size` and `Position` properties evaluate procedural expressions:
   - Dynamically recalculates line wrapping, line index, and column offset.
@@ -67,16 +54,13 @@
 - **Padding X**:
   - Horizontal margin on the left and right sides of words/phrases (default: `8 px`).
 - **Roundness**:
-  - Corner radius control in pixels.
-  - Set to `0 px` for sharp square / rectangular blocks.
-  - Set to `> 0 px` (default: `6 px`) for sleek rounded capsules.
+  - Corner radius control in pixels (0 = sharp square blocks, >0 = rounded rects / capsules).
+- **Offset X & Offset Y**:
+  - Master fine-tuning sliders to adjust position alignment in real time.
 
-### 5. Color, Opacity & Background Controls
-- **Highlight Fill Color**: Live hex input, color picker, and quick swatches (*Hot Pink* `#FF2D78`, *Cyber Gold* `#FFE600`, *Mint Neon* `#00F59B`, *Sky Cyan* `#00D2FF`, *Lavender* `#C084FC`).
+### 5. Color & Opacity Controls
+- **Highlight Fill Color**: Live hex input and quick swatches (*Hot Pink* `#FF2D78`, *Cyber Gold* `#FFE600`, *Mint Neon* `#00F59B`, *Sky Cyan* `#00D2FF`, *Lavender* `#C084FC`).
 - **Highlight Opacity**: Slider from `0%` to `100%` (default `100%`).
-- **Background Plate**:
-  - Option to create or link a background solid/plate layer.
-  - Pre-calibrated palette: *Sky Blue* (`#74B9E7`, matching reference visual), *Slate Dark* (`#0F172A`), and *Clean White* (`#F8FAFC`).
 
 ---
 
@@ -88,17 +72,15 @@ flowchart TD
     B -->|Text Layer Selected| C["Read Source Text & Metrics"]
     B -->|No Text Layer Selected| D["Generate ~100-word Dummy Text & Randomize Font / Align / Width / Indent"]
     
-    C --> E["Create / Link Background Solid (Sky Blue #74B9E7)"]
+    C --> E["Create Highlight Shape Layer Directly Below Text"]
     D --> E
     
-    E --> F["Create Highlight Shape Layer Directly Below Text"]
-    F --> G["Parent Shape Layer to Text Layer (Transform Sync)"]
+    E --> F["Parent Shape Layer to Text Layer (Transform Sync)"]
+    F --> G["Add Master Effect Controls: Thickness Y, Padding X, Roundness, Offset X/Y, Color, Opacity"]
+    G --> H["For Each Match: Generate Vector Shape Rect + Fill"]
     
-    G --> H["Add Master Effect Controls: Thickness Y, Padding X, Roundness, Color, Opacity"]
-    H --> I["For Each Match: Generate Vector Shape Rect + Fill"]
-    
-    I --> J["Apply Sub-Pixel Precise Size & Position Expressions"]
-    J --> K["Real-Time Viewport / Timeline Interaction"]
+    H --> I["Apply Sub-Pixel Precise Size & Position Expressions"]
+    I --> J["Real-Time Viewport / Timeline Interaction"]
 ```
 
 ---
@@ -107,6 +89,7 @@ flowchart TD
 
 | Control | Description | Default |
 | :--- | :--- | :--- |
+| **Presets Dropdown** | Curated styling presets (Hot Pink, Neon Mint, Golden Glow, Electric Cyan, Lavender, Slow Living). | Hot Pink |
 | **Target Text Layer** | Displays currently bound layer; "Detect Selection" re-scans comp. | Auto-detect |
 | **🎲 Randomize Dummy & Layout** | Re-rolls font, alignment, text box width, indent, and picks 3 words + 1 sentence. | Action |
 | **Font Dropdown** | Select from typical system fonts (Georgia, Arial, Times, Verdana, etc.). | Random |
@@ -119,10 +102,10 @@ flowchart TD
 | **Thickness Y** | Vertical expansion beyond font ascender/descender (0 = strict fit). | `0 px` |
 | **Padding X** | Horizontal padding on the left and right of words. | `8 px` |
 | **Roundness** | Corner radius (0 = sharp square blocks, >0 = rounded rects). | `6 px` |
-| **Highlight Color** | Color picker + Hex input + 5 one-click palette presets. | `#FF2D78` (Pink) |
+| **Offset X / Y** | Fine-tuning position offsets in pixels. | `0 px` |
+| **Highlight Color** | Hex input + 5 one-click palette presets. | `#FF2D78` (Pink) |
 | **Highlight Opacity** | Slider from 0% to 100%. | `100%` |
-| **Create Background Plate**| Generates a solid plate at the bottom of the comp. | `Checked` (`#74B9E7`) |
-| **► Build Highlights** | Primary build action (auto-detected in browser simulator). | Action |
+| **🖊️ Create Highlight Layer** | Primary build action (auto-detected in browser simulator). | Action |
 | **⟳ Update Properties** | Pushes updated slider values to existing shape layer in real time. | Action |
 
 ---
