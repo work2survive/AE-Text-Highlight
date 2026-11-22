@@ -1,4 +1,4 @@
-# AE Text Highlight (v1.1.3)
+# AE Text Highlight (v1.1.4)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -14,6 +14,12 @@
 ---
 
 ## ✨ Features & What's New
+
+### 🚀 What's New in v1.1.4
+- **Precision Alignment & Typography Injection**: Baked detected font size, font family, justification, and leading directly into procedural expressions as baseline constants. In AE projects using the Legacy ExtendScript expression engine where `sourceText.style` is unavailable, expressions previously defaulted to 34px Georgia with Left alignment, causing systematic offsets when the text layer had different font sizes (e.g. 22px) or Center/Right alignment.
+- **Line Break Normalization (`\r\n` / `\r` / `\n`)**: Normalized all line breaks before index mapping so character pointers and line starts never drift across multi-line paragraphs.
+- **Calibrated Typographic Metric Tables**: Integrated exact sub-pixel advance width ratios for Trebuchet MS, Arial, Georgia, Times New Roman, Verdana, Impact, and Courier New.
+- **Multi-Line Sentence Wrapping**: Supported matching and highlighting phrases across line breaks without offsets.
 
 ### 🚀 What's New in v1.1.3
 - **Fixed `ReferenceError: Object is invalid`**: Completely restructured layer lifecycle and reordering order. In Adobe After Effects ExtendScript, modifying layer stack order (`moveAfter()`, `moveToEnd()`) shifts composition indices, which invalidates pre-existing C++ layer pointers. By configuring all properties, vector groups, and parenting *before* reordering, and re-querying layer references by name, the `Object is invalid` error is completely eliminated.
