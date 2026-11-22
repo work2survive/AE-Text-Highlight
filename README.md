@@ -1,4 +1,4 @@
-# AE Text Highlight (v1.4.1)
+# AE Text Highlight (v1.4.2)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -14,6 +14,13 @@
 ---
 
 ## ✨ Features & What's New
+
+### 🚀 What's New in v1.4.2
+- **Sub-Pixel Font Offset Elimination (Georgia, Cambria, Arial & All System Fonts)**:
+  - **Active Off-Screen Measurement Layer**: Configured temporary measurement text layers as enabled (`enabled = true`), active across all composition time (`startTime = 0`, `inPoint = 0`), and moved off-screen (`[-9999, -9999]`), ensuring `sourceRectAtTime()` always accesses After Effects' native typography engine without time-clipping or fallback degradation.
+  - **Delimiter-Anchored Space Advance Engine**: Solved the whitespace blindness of After Effects' `sourceRectAtTime()`. By anchoring the preceding text with a temporary delimiter (`prefix + "|"`), the exact typographic advance of all preceding characters and trailing spaces is captured with sub-pixel precision (`startX = preAdvance + rSeg.left`, `endX = rAll.left + rAll.width`).
+  - **Calibrated Justification Coordinate System**: Normalized line start calculations for both Box Text (`isBox`) and Point Text across Left, Center, and Right justifications.
+  - **Cambria Typographic Metrics**: Added explicit Cambria metrics to fallback tables.
 
 ### 🚀 What's New in v1.4.1
 - **Fixed After Effects Dockable Panel Squeezed Layout**:
