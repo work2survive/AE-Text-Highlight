@@ -1,4 +1,4 @@
-# AE Text Highlight (v1.3.0)
+# AE Text Highlight (v1.4.0)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -14,6 +14,20 @@
 ---
 
 ## ✨ Features & What's New
+
+### 🚀 What's New in v1.4.0
+- **"Make Precomp Out of Text Box" Integration** (Reference: [`AE_Text_Precomp.jsx`](https://github.com/work2survive/AE-text-precomp)):
+  - Added a **"Make Precomp Out of Text Box"** checkbox directly into the Text Box tab.
+  - Precomposes both the text box and procedural highlight layers into a cleanly cropped precomposition matching the exact paragraph box dimensions.
+  - **Zero Visual Shift**: Mathematically calculates the origin shift and compensates position, anchor point, scale, and rotation so neither the text nor the highlights jump on screen.
+- **Dedicated 3-Tab Architecture**:
+  - **📝 Text Box**: Focused purely on target text layer detection, precomposition checkbox, and target phrase/word entry.
+  - **🎲 Dummy Text**: Moved dummy text generator and multi-attribute randomizer into its own dedicated tab with clear guidance: *"⚠️ Dummy Text Generator ONLY applies when NO text layer is selected"*.
+  - **🎨 Appearance**: Geometry controls and interactive color management.
+- **Interactive Color Picker** (Reference: [`custom_rounded_rect.jsx`](https://github.com/work2survive/AE_JS_builder/blob/main/jsx/custom_rounded_rect.jsx)):
+  - Replaced static text inputs with an interactive vector swatch button and hex editor.
+  - Supports AE ExtendScript desktop `$.colorPicker`, Windows OS color picker, and web browser color selection.
+  - Live synchronization between color swatch, hex input, and curated look presets.
 
 ### 🚀 What's New in v1.3.0
 - **Integrated Text & Box Properties Engine** (Reference: [`Text_Properties_To_Effects.jsx`](https://github.com/work2survive/AE_JS_builder/blob/main/samples/Text_Properties_To_Effects.jsx)):
