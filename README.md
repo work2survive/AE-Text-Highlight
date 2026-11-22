@@ -1,4 +1,4 @@
-# AE Text Highlight (v1.2.1)
+# AE Text Highlight (v1.2.2)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -15,8 +15,15 @@
 
 ## ✨ Features & What's New
 
+### 🚀 What's New in v1.2.2
+- **Fixed Highlight Misplacement on Paragraph & Centered Text**:
+  - **Automatic Visual Line Wrapping**: Detects Paragraph (Area / Box) Text layers and dynamically decomposes lines to match After Effects' native line wraps instead of treating the entire paragraph as a single runaway line.
+  - **Anchor-Relative Origin Compensation**: Anchors coordinates using native `sourceRectAtTime()` (`sRect.left` and `sRect.top`), eliminating horizontal and vertical offsets for text layers with centered, bottom, or custom anchor points.
+  - **Native Sub-Pixel Typography Measurement**: Uses a temporary native measurement pass in After Effects to measure glyph advances with 100% precision for any font (including Poppins, Roboto, custom system fonts, etc.).
+  - **Real-Time Sliders with Streamlined Expressions**: Cleaned up runtime expressions to evaluate in microseconds without heavy frame-by-frame text parsing, keeping `Offset X`, `Offset Y`, `Padding X`, `Thickness Y`, `Roundness`, `Color`, and `Opacity` fully interactive in real time.
+
 ### 🚀 What's New in v1.2.1
-- **Fixed `currentOffsetX is undefined` Runtime Bug (line 838)**: Passed `offsetX` and `offsetY` directly into `createHighlightGroups` with safe numerical fallbacks, eliminating the ExtendScript alert thrown when building highlights.
+- **Fixed `currentOffsetX is undefined` Runtime Bug**: Passed `offsetX` and `offsetY` directly into `createHighlightGroups` with safe numerical fallbacks, eliminating the ExtendScript alert thrown when building highlights.
 - **Removed All Background Options**: Completely removed Background Plate controls, presets, and layer generation logic per user specification. No background solid or shape layer is created; only procedural highlight blocks parented to the text layer are generated.
 
 ### 🚀 What's New in v1.2.0
