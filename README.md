@@ -1,4 +1,4 @@
-# AE Text Highlight (v1.4.0)
+# AE Text Highlight (v1.4.1)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -14,6 +14,13 @@
 ---
 
 ## ✨ Features & What's New
+
+### 🚀 What's New in v1.4.1
+- **Fixed After Effects Dockable Panel Squeezed Layout**:
+  - Attached dynamic `win.onResizing = win.onResize = function() { this.layout.resize(); };` event listener for dockable ScriptUI panels so the layout recalculates immediately when docked or resized in the AE workspace.
+  - Added explicit `alignment = ["fill", "top"]` and `alignment = ["fill", "fill"]` to all panels, tabbed panels, tabs, rows, and buttons.
+  - Converted hardcoded dimension assignments to flexible `[-1, height]` and slider `alignment = ["fill", "center"]`, allowing the UI to expand and fill the panel width without horizontal clipping.
+  - Set `win.minimumSize = [280, 420];` to prevent panel elements from collapsing into narrow columns.
 
 ### 🚀 What's New in v1.4.0
 - **"Make Precomp Out of Text Box" Integration** (Reference: [`AE_Text_Precomp.jsx`](https://github.com/work2survive/AE-text-precomp)):
