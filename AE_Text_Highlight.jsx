@@ -947,29 +947,77 @@
 
         // Temporary measurement helper for exact After Effects sub-string widths
         var measureLayer = null;
+        var measureTextProp = null;
         if (comp && typeof comp.layers.addText === "function") {
             try {
                 measureLayer = comp.layers.addText("");
                 measureLayer.enabled = false;
-                if (props.textDoc && measureLayer.sourceText) {
-                    measureLayer.sourceText.setValue(props.textDoc);
+                try {
+                    measureTextProp = measureLayer.property("Source Text");
+                } catch (eP1) {}
+                if (!measureTextProp) {
+                    try { measureTextProp = measureLayer.property("ADBE Text Properties").property("ADBE Text Document"); } catch (eP2) {}
+                }
+                if (!measureTextProp && measureLayer.sourceText) {
+                    measureTextProp = measureLayer.sourceText;
+                }
+                if (measureTextProp) {
+                    var mDoc = null;
+                    try { mDoc = measureTextProp.value; } catch (eMVal) {}
+                    if (mDoc) {
+                        mDoc.fontSize = props.fontSize || 34;
+                        if (props.font) {
+                            try { mDoc.font = props.font; } catch (eMF) {}
+                        }
+                        mDoc.tracking = props.tracking || 0;
+                        mDoc.applyStroke = (props.strokeWidth > 0);
+                        mDoc.strokeWidth = props.strokeWidth || 0;
+                        mDoc.applyFill = true;
+                        mDoc.fillColor = [1, 1, 1];
+                        try { measureTextProp.setValue(mDoc); } catch (eMSet) {}
+                    } else if (props.textDoc) {
+                        try { measureTextProp.setValue(props.textDoc); } catch (eMSet2) {}
+                    }
                 }
             } catch (eM) {
                 measureLayer = null;
+                measureTextProp = null;
             }
         }
 
+        var spaceWidth = (props.metrics && props.metrics.spaceWidth > 0) ? props.metrics.spaceWidth : (fs * 0.28);
+
         function measureString(str) {
             if (!str || str.length === 0) return 0;
-            if (measureLayer) {
+            var trailingSpacesMatch = str.match(/\s+$/);
+            var numTrailing = trailingSpacesMatch ? trailingSpacesMatch[0].length : 0;
+            var leadingSpacesMatch = str.match(/^\s+/);
+            var numLeading = leadingSpacesMatch ? leadingSpacesMatch[0].length : 0;
+            var trimmed = trimStr(str);
+            if (trimmed.length === 0) {
+                return str.length * spaceWidth;
+            }
+
+            var baseW = 0;
+            if (measureLayer && measureTextProp) {
                 try {
-                    var doc = measureLayer.sourceText.value;
-                    doc.text = str;
-                    measureLayer.sourceText.setValue(doc);
-                    return measureLayer.sourceRectAtTime(0, false).width;
+                    var doc = measureTextProp.value;
+                    if (doc) {
+                        doc.text = trimmed;
+                        measureTextProp.setValue(doc);
+                    } else {
+                        measureTextProp.setValue(trimmed);
+                    }
+                    var r = measureLayer.sourceRectAtTime(0, false);
+                    if (r && typeof r.width === "number" && !isNaN(r.width) && r.width > 0) {
+                        baseW = r.width;
+                    }
                 } catch (e) {}
             }
-            return measureTextExact(str, fs, props.font);
+            if (baseW <= 0) {
+                baseW = measureTextExact(trimmed, fs, props.font);
+            }
+            return baseW + (numLeading + numTrailing) * spaceWidth;
         }
 
         var totalCreated = 0;
@@ -1055,10 +1103,12 @@
 
                     var colStart = found;
                     var segText = lineStr.substr(colStart, term.length);
-                    var prefix = lineStr.substr(0, colStart);
-
-                    var pW = measureString(prefix);
                     var mW = measureString(segText);
+                    var pW = 0;
+                    if (colStart > 0) {
+                        var combined = lineStr.substr(0, colStart + term.length);
+                        pW = Math.max(0, measureString(combined) - mW);
+                    }
                     var curLineW = lineWidths[vl] || measureString(lineStr);
 
                     createVectorHighlightGroup(segText, pW, mW, curLineW, vl);
@@ -1106,9 +1156,12 @@
                                 var targetLine = lines[rng.vl];
                                 var fIdx = targetLine.toLowerCase().indexOf(phraseSeg.toLowerCase());
                                 if (fIdx !== -1) {
-                                    var preStr = targetLine.substr(0, fIdx);
-                                    var pW2 = measureString(preStr);
-                                    var mW2 = measureString(targetLine.substr(fIdx, phraseSeg.length));
+                                    var mW2 = measureString(phraseSeg);
+                                    var pW2 = 0;
+                                    if (fIdx > 0) {
+                                        var combined2 = targetLine.substr(0, fIdx + phraseSeg.length);
+                                        pW2 = Math.max(0, measureString(combined2) - mW2);
+                                    }
                                     var curLW2 = lineWidths[rng.vl] || measureString(targetLine);
                                     createVectorHighlightGroup(phraseSeg, pW2, mW2, curLW2, rng.vl);
                                 }
@@ -1121,6 +1174,8 @@
 
         if (measureLayer) {
             try { measureLayer.remove(); } catch (eClean) {}
+            measureLayer = null;
+            measureTextProp = null;
         }
 
         return totalCreated;
