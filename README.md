@@ -142,7 +142,7 @@ flowchart TD
 | **Roundness** | Geometry Panel | Corner radius for highlight boxes (0 = square, >0 = pill/capsule). | `6 px` |
 | **Offset X / Y** | Geometry Panel | Fine-tuning position offsets in pixels. | `0 px` |
 | **Opacity** | Geometry Panel | Fill opacity from 0% to 100%. | `100%` |
-| **Create Dummy Text Box** | Advanced Tab | Generates a 950×450 paragraph box text layer for testing. | Action |
+| **Create Dummy Text Box** | Advanced Tab | Generates a 950×450 paragraph box text layer with customizable or randomized alignment (Left, Center, Right) for testing. | Action |
 | **Knowledge Base Links** | Advanced Tab | Direct links to all architectural guides and repositories. | Reference |
 | **Remove Highlights** | Footer | Deletes generated rig layers / precomp and restores original text box. | Action |
 | **Build Highlights** | Footer | Executes anchor alignment and builds highlights with selected method. | Action |
