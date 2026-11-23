@@ -116,9 +116,11 @@ flowchart TD
 
 ### 5. Mirrored Precomposition Option
 - **"Make Precomp Out of Rig"**:
+  - Sets precomposition dimensions strictly to the original text box size (`width = boxWidth, height = boxHeight`).
+  - Enables Continuous Rasterization / Collapse Transformations (`collapseTransformation = true`) so vector highlight padding/thickness renders with razor-sharp vector fidelity without boundary clipping.
   - Automatically mirrors all master effect controls onto the precomp layer in the parent composition.
   - Expression-links inner shape effects directly back to the parent precomp layer (`comp("Main Comp").layer("Precomp Layer").effect("...")`).
-  - Parents the precomp layer to the original text box.
+  - Maintains 0.00px visual shift with affine coordinate compensation.
 
 ### 6. Universal "Remove Highlights & Restore"
 - One-click non-destructive clean-up:
