@@ -1,4 +1,4 @@
-# AE Text Highlight (v1.4.2)
+# AE Text Highlight (v2.0.0)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -7,145 +7,111 @@
 
 **Live Demo**: [https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 
-**AE Text Highlight** is a parametric, expression-rigged Adobe After Effects ScriptUI panel that detects the exact geometric position of specified words, character sequences, or full sentences inside any text layer and places procedural vector highlight blocks directly underneath the text with **zero cumulative offset**.
-
-> **Live Browser Simulator**: Test, customize, and preview this tool interactively in the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true) directly in your browser without launching After Effects!
+**AE Text Highlight v2.0.0** is an architectural rebuild and procedural typography rigging engine for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/). It decomposes paragraph box text and point text layers into mathematically calibrated, independent sub-pixel text boxes with top-left anchor points, aligns anchor points based on text justification with zero visual shift, rigs procedural vector highlight boxes behind highlighted words, provides interactive color pickers for both highlight boxes and highlighted text, supports precomposition with mirrored expression controls, and offers one-click non-destructive removal and restoration.
 
 ---
 
-## ✨ Features & What's New
-
-### 🚀 What's New in v1.4.2
-- **Sub-Pixel Font Offset Elimination (Georgia, Cambria, Arial & All System Fonts)**:
-  - **Active Off-Screen Measurement Layer**: Configured temporary measurement text layers as enabled (`enabled = true`), active across all composition time (`startTime = 0`, `inPoint = 0`), and moved off-screen (`[-9999, -9999]`), ensuring `sourceRectAtTime()` always accesses After Effects' native typography engine without time-clipping or fallback degradation.
-  - **Delimiter-Anchored Space Advance Engine**: Solved the whitespace blindness of After Effects' `sourceRectAtTime()`. By anchoring the preceding text with a temporary delimiter (`prefix + "|"`), the exact typographic advance of all preceding characters and trailing spaces is captured with sub-pixel precision (`startX = preAdvance + rSeg.left`, `endX = rAll.left + rAll.width`).
-  - **Calibrated Justification Coordinate System**: Normalized line start calculations for both Box Text (`isBox`) and Point Text across Left, Center, and Right justifications.
-  - **Cambria Typographic Metrics**: Added explicit Cambria metrics to fallback tables.
-
-### 🚀 What's New in v1.4.1
-- **Fixed After Effects Dockable Panel Squeezed Layout**:
-  - Attached dynamic `win.onResizing = win.onResize = function() { this.layout.resize(); };` event listener for dockable ScriptUI panels so the layout recalculates immediately when docked or resized in the AE workspace.
-  - Added explicit `alignment = ["fill", "top"]` and `alignment = ["fill", "fill"]` to all panels, tabbed panels, tabs, rows, and buttons.
-  - Converted hardcoded dimension assignments to flexible `[-1, height]` and slider `alignment = ["fill", "center"]`, allowing the UI to expand and fill the panel width without horizontal clipping.
-  - Set `win.minimumSize = [280, 420];` to prevent panel elements from collapsing into narrow columns.
-
-### 🚀 What's New in v1.4.0
-- **"Make Precomp Out of Text Box" Integration** (Reference: [`AE_Text_Precomp.jsx`](https://github.com/work2survive/AE-text-precomp)):
-  - Added a **"Make Precomp Out of Text Box"** checkbox directly into the Text Box tab.
-  - Precomposes both the text box and procedural highlight layers into a cleanly cropped precomposition matching the exact paragraph box dimensions.
-  - **Zero Visual Shift**: Mathematically calculates the origin shift and compensates position, anchor point, scale, and rotation so neither the text nor the highlights jump on screen.
-- **Dedicated 3-Tab Architecture**:
-  - **📝 Text Box**: Focused purely on target text layer detection, precomposition checkbox, and target phrase/word entry.
-  - **🎲 Dummy Text**: Moved dummy text generator and multi-attribute randomizer into its own dedicated tab with clear guidance: *"⚠️ Dummy Text Generator ONLY applies when NO text layer is selected"*.
-  - **🎨 Appearance**: Geometry controls and interactive color management.
-- **Interactive Color Picker** (Reference: [`custom_rounded_rect.jsx`](https://github.com/work2survive/AE_JS_builder/blob/main/jsx/custom_rounded_rect.jsx)):
-  - Replaced static text inputs with an interactive vector swatch button and hex editor.
-  - Supports AE ExtendScript desktop `$.colorPicker`, Windows OS color picker, and web browser color selection.
-  - Live synchronization between color swatch, hex input, and curated look presets.
-
-### 🚀 What's New in v1.3.0
-- **Integrated Text & Box Properties Engine** (Reference: [`Text_Properties_To_Effects.jsx`](https://github.com/work2survive/AE_JS_builder/blob/main/samples/Text_Properties_To_Effects.jsx)):
-  - **Comprehensive Property Extraction**: Extracts complete typography and box metrics: `boxText`, `boxTextSize`, `sourceRectAtTime()` (`left`, `top`, `width`, `height`), `fontSize`, `leading`, `tracking`, `baselineShift`, `strokeWidth`, `indentLeft`, and `indentRightSpare`.
-  - **In-Memory Typography Metrics Store**: Caches words, word widths, visual lines, line widths, and space width in `$.global.AE_TEXT_BOX_MEMORY` and `layer._textMetrics`.
-  - **Fixed Paragraph Justification Enums**: Full support for native After Effects ExtendScript justification enums (`ParagraphJustification.LEFT_JUSTIFY` / `7412`, `RIGHT_JUSTIFY` / `7413`, `CENTER_JUSTIFY` / `7414`, and full justify enums `7415`–`7418`).
-- **Eliminated Offset & Wrong-Word Targeting**:
-  - Replaced fragile character index projections with line-by-line token matching, eliminating offsets that previously caused highlights to drift onto adjacent words (such as targeting *voluptatem* and highlighting *porro*).
-  - Accurate anchor centering for Left, Center, and Right justified paragraph boxes.
-  - Multi-line phrase and sentence support across soft paragraph line wraps.
-- **Clean Appearance**: Background plates and options remain completely removed.
-
-### 🚀 What's New in v1.2.1
-- **Fixed `currentOffsetX is undefined` Runtime Bug**: Passed `offsetX` and `offsetY` directly into `createHighlightGroups` with safe numerical fallbacks, eliminating the ExtendScript alert thrown when building highlights.
-- **Removed All Background Options**: Completely removed Background Plate controls, presets, and layer generation logic per user specification. No background solid or shape layer is created; only procedural highlight blocks parented to the text layer are generated.
-
-### 🚀 What's New in v1.2.0
-- **Modern Tabbed Interface**: Redesigned ScriptUI Panel into two clean tabs matching Suite UX standards:
-  - **📝 Text Box**: Target text layer detection, dummy text generator & multi-attribute randomizer (Font, Alignment, Box Width, Indent), and highlight target input (multiline textarea with quick-action buttons).
-  - **🎨 Appearance**: Thickness Y, Padding X, Roundness, Offset X/Y, and Highlight Color & Opacity with color swatches.
-- **Curated Styling Presets**: Quick dropdown with curated looks (*Hot Pink*, *Neon Mint*, *Golden Glow*, *Electric Cyan*, *Lavender Dream*, *Slow Living Demo*).
-- **ExtendScript Property Group Invalidation Fix**: Precomputed geometry and fully configured vector shapes before attaching expressions to prevent `Object is invalid` errors.
-
-### 1. Sub-Pixel Precision & Zero Cumulative Offset
-- **Exact Measurement Engine**: Sub-pixel Canvas 2D measurement stack (`document.createElement('canvas').getContext('2d')`) matching the browser's SVG font engine and calibrated fallback metric tables for desktop After Effects ExtendScript.
-- **Zero Drift**: Eliminates cumulative position error so words deep into long lines (or at the very end of sentences) are centered with 100% precision.
-
-### 2. Procedural Dummy Text Generation & Multi-Attribute Randomization
-- When **no text layer is selected**, running the tool creates a ~100-word *"Lorem ipsum dolor sit amet..."* dummy text layer and randomizes:
-  - **Font**: Selected from typical system fonts (`Georgia`, `Arial`, `Times New Roman`, `Verdana`, `Trebuchet MS`, `Courier New`, `Impact`).
-  - **Alignment**: `Left`, `Center`, or `Right` justification.
-  - **Text Box Width**: Randomly chosen (700px – 1200px) with procedural word wrapping to fit the exact width.
-  - **First-Line Indent**: Randomly applied (0px, 24px, 48px, 72px).
-  - **Highlight Targets**: Automatically extracts **3 random distinct words** and **1 full sentence** from the wrapped text.
-- **One-Click Randomization**: Use the *"🎲 Randomize Dummy & Layout"* button in the ScriptUI panel to re-roll fonts, widths, indents, and alignments at any time.
-
-### 3. Real-Time Procedural Rigging
-- **True Stacking Order**: Highlight blocks are generated on a dedicated vector Shape Layer placed **directly below** the text layer.
-- **Transformation Parenting**: The shape layer is parented to the text layer (`shapeLayer.parent = textLayer`). Moving, scaling, rotating, or animating the text layer carries the highlight blocks in lockstep.
-- **Dynamic Expression Engine**: Each highlight box's `Size` and `Position` properties evaluate procedural expressions:
-  - Dynamically recalculates line wrapping, line index, and column offset.
-  - Dynamically measures character widths, line leading, and justification.
-  - **Graceful Deletion Handling**: If a highlighted word is deleted from the text, its block collapses to `[0, 0]` without expression errors, and reappears when typed back in.
-
-### 4. Typography & Geometry Engine
-- **Thickness Y (Ascender to Descender)**:
-  - **Default: `0 px`**: Strictly and tightly locked to the font's **Ascender to Descender** vertical span ($\text{Top} = -0.75 \times \text{fontSize}$, $\text{Bottom} = +0.25 \times \text{fontSize}$, $\text{CenterY} = -0.25 \times \text{fontSize}$).
-  - Slider allows adding extra vertical breathing room or tightening the fit.
-- **Padding X**:
-  - Horizontal margin on the left and right sides of words/phrases (default: `8 px`).
-- **Roundness**:
-  - Corner radius control in pixels (0 = sharp square blocks, >0 = rounded rects / capsules).
-- **Offset X & Offset Y**:
-  - Master fine-tuning sliders to adjust position alignment in real time.
-
-### 5. Color & Opacity Controls
-- **Highlight Fill Color**: Live hex input and quick swatches (*Hot Pink* `#FF2D78`, *Cyber Gold* `#FFE600`, *Mint Neon* `#00F59B`, *Sky Cyan* `#00D2FF`, *Lavender* `#C084FC`).
-- **Highlight Opacity**: Slider from `0%` to `100%` (default `100%`).
-
----
-
-## 📐 Architecture & Workflow
+## 🏛️ v2.0.0 Core Architecture & Pipeline
 
 ```mermaid
 flowchart TD
-    A["AE Text Highlight UI Panel"] -->|User inputs words or clicks Randomize| B["Target Text Layer Detection"]
-    B -->|Text Layer Selected| C["Read Source Text & Metrics"]
-    B -->|No Text Layer Selected| D["Generate ~100-word Dummy Text & Randomize Font / Align / Width / Indent"]
+    UI["ScriptUI Panel (v2.0.0)"] -->|"Build Highlights"| DETECT["Detect or Generate Target Text Box"]
+    DETECT -->|"1. Align Anchor Point"| ALIGN["Anchor Alignment via Justification (Zero Visual Shift)"]
+    ALIGN -->|"2. Inspector Effects"| FX["Attach Typography Properties Effects (Box Size, Text Size, Alignment)"]
+    FX -->|"3. Mark Guideline"| GUIDE["Hide Original Text Box as Guideline (guideLayer=true, enabled=false)"]
+    GUIDE -->|"4. Line & Word Splitting"| SPLIT["Split Lines into Independent Text Boxes (Top-Left Anchors)"]
+    SPLIT -->|"5. Procedural Vector Shapes"| SHAPE["Create Highlight Shape Layer (Top-Left Anchors, Parented to Original)"]
+    SHAPE -->|"Color Linking"| COLOR["Interactive Color Pickers (Highlight Fill + Highlighted Text Color)"]
     
-    C --> E["Create Highlight Shape Layer Directly Below Text"]
-    D --> E
+    SHAPE --> OPT{"Make Precomp?"}
+    OPT -->|"Yes"| PRE["Precompose Created Layers -> Mirror Master Effects -> Expression Link"]
+    OPT -->|"No"| RIG["Direct Child Hierarchy Parented to Original Text Layer"]
     
-    E --> F["Parent Shape Layer to Text Layer (Transform Sync)"]
-    F --> G["Add Master Effect Controls: Thickness Y, Padding X, Roundness, Offset X/Y, Color, Opacity"]
-    G --> H["For Each Match: Generate Vector Shape Rect + Fill"]
-    
-    H --> I["Apply Sub-Pixel Precise Size & Position Expressions"]
-    I --> J["Real-Time Viewport / Timeline Interaction"]
+    UI -->|"Remove Highlights & Restore"| RESTORE["Delete Created Layers/Precomp & Restore Original Text Layer"]
+    UI -->|"Create Dummy Text Box"| DUMMY["Procedural Dummy Text Box Generator"]
 ```
 
 ---
 
-## 🛠 ScriptUI Controls Overview
+## 🚀 What's New in v2.0.0
 
-| Control | Description | Default |
-| :--- | :--- | :--- |
-| **Presets Dropdown** | Curated styling presets (Hot Pink, Neon Mint, Golden Glow, Electric Cyan, Lavender, Slow Living). | Hot Pink |
-| **Target Text Layer** | Displays currently bound layer; "Detect Selection" re-scans comp. | Auto-detect |
-| **🎲 Randomize Dummy & Layout** | Re-rolls font, alignment, text box width, indent, and picks 3 words + 1 sentence. | Action |
-| **Font Dropdown** | Select from typical system fonts (Georgia, Arial, Times, Verdana, etc.). | Random |
-| **Align Dropdown** | Paragraph justification (Left, Center, Right). | Random |
-| **Box Width Slider** | Target width for automatic word-wrapping (600px - 1300px). | `950 px` |
-| **Indent Slider** | First-line paragraph indentation (0px - 80px). | `0 px` |
-| **Highlight Targets** | Multi-line text field for words, phrases, or sentences to highlight. | 3 words + 1 sentence |
-| **🎲 Re-Pick 3 Words + 1 Sent** | Auto-extracts 3 random words and 1 full sentence from the current text. | Action |
-| **📷 Slow Living (Demo)** | Loads the exact quote and highlights from the reference image. | Preset |
-| **Thickness Y** | Vertical expansion beyond font ascender/descender (0 = strict fit). | `0 px` |
-| **Padding X** | Horizontal padding on the left and right of words. | `8 px` |
-| **Roundness** | Corner radius (0 = sharp square blocks, >0 = rounded rects). | `6 px` |
-| **Offset X / Y** | Fine-tuning position offsets in pixels. | `0 px` |
-| **Highlight Color** | Hex input + 5 one-click palette presets. | `#FF2D78` (Pink) |
-| **Highlight Opacity** | Slider from 0% to 100%. | `100%` |
-| **🖊️ Create Highlight Layer** | Primary build action (auto-detected in browser simulator). | Action |
-| **⟳ Update Properties** | Pushes updated slider values to existing shape layer in real time. | Action |
+### 1. Justification-Based Zero-Shift Anchor Alignment
+- **Knowledge Base**: [AE-Align-AnchorPoint](https://github.com/work2survive/AE-Align-AnchorPoint) & [AE_VS_JS_TEXT_RENDERING_DIFFERENCES.md](https://github.com/work2survive/AE_JS_builder/blob/main/AE_VS_JS_TEXT_RENDERING_DIFFERENCES.md).
+- Prior to decomposition, the original text box anchor point is aligned based on its justification:
+  - **Left Justified** $\to$ Top-Left
+  - **Center Justified** $\to$ Top-Center
+  - **Right Justified** $\to$ Top-Right
+- **Zero Visual Shift**: Compensates layer position simultaneously so the visual layout in the composition does not shift by even a fraction of a pixel.
+
+### 2. Live Typography Inspector Effects Controls
+- **Knowledge Base**: [Text_Properties_To_Effects.jsx](https://github.com/work2survive/AE_JS_builder/blob/main/samples/Text_Properties_To_Effects.jsx).
+- Attaches live expression and slider controls to the original text layer:
+  - `Box Text Width`, `Box Text Height`
+  - `Text Width`, `Text Height`
+  - `Visual Center Offset`
+  - `Alignment Index` (`0=Left`, `1=Center`, `2=Right`)
+  - `Is Paragraph Box Text` (`1=Yes`, `0=No`)
+  - `Anchor Align X`, `Anchor Align Y`
+
+### 3. Visual Line & Word Splitting Engine
+- **Knowledge Base**: [AE_Text_Precomp.jsx](https://github.com/work2survive/AE_JS_builder/blob/main/samples/AE_Text_Precomp.jsx) / [AE-text-precomp](https://github.com/work2survive/AE-text-precomp).
+- Detects which visual lines contain highlighted target words:
+  - **Unhighlighted Lines**: Preserved as single independent text box layers (`[Line N]`).
+  - **Highlighted Lines**: Split into separate non-highlight text segments (`[HL-Text]`) and dedicated target word boxes (`[HL-Target]`).
+- **Top-Left Anchor Pinning**: All generated text boxes have their anchor point strictly assigned to Top-Left (`[r.left, r.top]`).
+- **Delimiter-Anchored Advance**: Positions words along the exact baseline using sub-pixel delimiter measurement (`measurer.measurePrefixAdvance()`), completely eliminating font-specific kerning drift across Georgia, Cambria, Arial, and other typefaces.
+
+### 4. Procedural Vector Highlight Shapes Layer
+- Creates a dedicated vector Shape Layer (`OriginalName - Highlights`) parented to the original text layer.
+- Builds a procedural rounded rectangle for each highlighted word box:
+  - Anchor point pinned to Top-Left.
+  - Size dynamically expression-linked to `Padding X` and `Thickness Y`.
+  - Position dynamically expression-linked to `Offset X` and `Offset Y`.
+  - Corner radius dynamically expression-linked to `Roundness`.
+  - Fill color dynamically expression-linked to `Highlight Color`.
+  - Opacity dynamically expression-linked to `Highlight Opacity`.
+- Automatically expressions the `Source Text` fill color of `[HL-Target]` text layers to match the `Highlighted Text Color` master control.
+
+### 5. Dual Interactive Color Pickers
+- **Knowledge Base**: [custom_rounded_rect.jsx](https://github.com/work2survive/AE_JS_builder/blob/main/jsx/custom_rounded_rect.jsx).
+- Interactive vector swatch buttons and hex editors:
+  - **Highlight Box Color**: Controls the background fill of the highlight shapes.
+  - **Highlighted Text Color**: Controls the typography color of the target words.
+- Supports native `$.colorPicker`, Windows OS picker, and browser color input in simulator mode.
+
+### 6. Mirrored Precomposition Option
+- **"Make Precomp Out of Rig"**:
+  - Precomposes all created split text layers and the highlight shape layer.
+  - Automatically mirrors all master effect controls onto the precomp layer in the main composition.
+  - Expression-links inner shape effects directly back to the parent precomp layer (`comp("Main Comp").layer("Precomp Layer").effect("...")`).
+  - Parents the precomp layer to the hidden guideline original text box.
+
+### 7. Non-Destructive "Remove Highlights & Restore"
+- Cleans up all child layers (`[Line N]`, `[HL-Text]`, `[HL-Target]`, `- Highlights`, and precomp layers).
+- Restores the original text layer to its fully active state (`guideLayer = false`, `enabled = true`) and selects it.
+
+### 8. Dedicated "Create Dummy Text Box" Testing Generator
+- Tabbed controls with customizable **Font** (`Georgia`, `Arial`, `Cambria`, etc.) and **Justification** (`Left`, `Center`, `Right`).
+- Generates a 950x450 paragraph box text layer with realistic multiline text ready for testing.
+
+---
+
+## 🛠️ ScriptUI Controls Reference
+
+| Control | Location | Description | Default |
+| :--- | :--- | :--- | :--- |
+| **Highlight Targets** | Main Panel | Multiline textarea for words, phrases, or sentences to highlight. | Auto-sampled |
+| **Highlight Color** | Main Panel | Interactive swatch & hex editor for highlight box fill. | `#FF296D` (Hot Pink) |
+| **Text Color** | Main Panel | Interactive swatch & hex editor for highlighted word text. | `#FFFFFF` (White) |
+| **Make Precomp Out of Rig** | Main Panel | Precomposes created layers with mirrored master effect controls. | `false` |
+| **Padding X** | Geometry Panel | Horizontal padding on left and right of highlight boxes. | `6 px` |
+| **Thickness Y** | Geometry Panel | Vertical expansion of highlight boxes. | `4 px` |
+| **Roundness** | Geometry Panel | Corner radius for highlight boxes (0 = square, >0 = pill/capsule). | `6 px` |
+| **Offset X / Y** | Geometry Panel | Fine-tuning position offsets. | `0 px` |
+| **Opacity** | Geometry Panel | Fill opacity from 0% to 100%. | `100%` |
+| **Create Dummy Text Box** | Advanced Tab | Generates paragraph box text for testing with custom font & align. | Action |
+| **Remove Highlights** | Footer | Deletes generated rig layers / precomp and restores original text box. | Action |
+| **Build Highlights** | Footer | Executes anchor alignment, line/word splitting, and procedural rigging. | Action |
 
 ---
 
