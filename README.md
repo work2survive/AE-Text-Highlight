@@ -7,92 +7,124 @@
 
 **Live Demo**: [https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 
-**AE Text Highlight v2.0.0** is an architectural rebuild and procedural typography rigging engine for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/). It decomposes paragraph box text and point text layers into mathematically calibrated, independent sub-pixel text boxes with top-left anchor points, aligns anchor points based on text justification with zero visual shift, rigs procedural vector highlight boxes behind highlighted words, provides interactive color pickers for both highlight boxes and highlighted text, supports precomposition with mirrored expression controls, and offers one-click non-destructive removal and restoration.
+**AE Text Highlight v2.0.0** is an advanced procedural typography highlighting and rigging engine for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/). It features a top-level engine selector allowing users to choose between two distinct highlight strategies:
+1. **Split Method (Layer Decomposition)**: Decomposes target lines and words into independent text boxes with top-left anchor points, offering individual text layer control, separate text color assignments, and sub-pixel alignment.
+2. **Calculation Method (Intact Text Box)**: Keeps the original text layer completely intact without splitting, calculating the exact geometric coordinates and bounding sizes of highlight boxes in-place using all available typography parameters (`fontSize`, `leading`, `tracking`, `boxTextPos`, `sourceRectAtTime`, and delimiter-anchored advance).
 
 ---
 
-## 🏛️ v2.0.0 Core Architecture & Pipeline
+## 📚 Knowledge Base & Referenced Repositories
+
+The algorithms and architecture in this engine are derived from and cross-referenced with the following foundational resources:
+
+1. **[AE vs. JS Text Rendering Differences Guide](https://github.com/work2survive/AE_JS_builder/blob/main/AE_VS_JS_TEXT_RENDERING_DIFFERENCES.md)**:
+   - Comprehensive analysis of After Effects typography engine mechanics: Point Text vs. Paragraph (Box) Text coordinates, `boxTextPos` mapping, justification geometry, ascender-to-descender ratios, tracking conversion ($1/1000\text{ em}$), and delimiter-anchored space measurement.
+2. **[AE Align Anchor Point](https://github.com/work2survive/AE-Align-AnchorPoint)**:
+   - Mathematical algorithm for justification-based anchor point alignment (Left $\to$ Top-Left, Center $\to$ Top-Center, Right $\to$ Top-Right) with simultaneous position compensation guaranteeing **0.00px visual shift**.
+3. **[Text & Box Properties to Effects](https://github.com/work2survive/AE_JS_builder/blob/main/samples/Text_Properties_To_Effects.jsx)**:
+   - Real-time typography inspector attaching live effect controls (`Box Text Width`, `Box Text Height`, `Text Width`, `Text Height`, `Visual Center Offset`, `Alignment Index`, `Is Paragraph Box Text`, `Anchor Align X/Y`) to the text layer.
+4. **[AE Text Precomp (Zero-Shift Precomposition)](https://github.com/work2survive/AE_JS_builder/blob/main/samples/AE_Text_Precomp.jsx) / [AE-text-precomp](https://github.com/work2survive/AE-text-precomp)**:
+   - Visual line detection, selective line splitting, top-left anchor point pinning, and precomposition bounding-box compensation.
+5. **[Custom Rounded Rect & Color Pickers](https://github.com/work2survive/AE_JS_builder/blob/main/jsx/custom_rounded_rect.jsx)**:
+   - Interactive ScriptUI color swatches, hex editors, and cross-platform color picker integrations (`$.colorPicker`, Windows OS picker, and browser color input).
+6. **[AE Text Highlight Repository](https://github.com/work2survive/AE-Text-Highlight)**:
+   - Master repository hosting the complete source code, test suites, and documentation.
+
+---
+
+## 🏛️ Architecture & Dual-Method Pipeline
 
 ```mermaid
 flowchart TD
-    UI["ScriptUI Panel (v2.0.0)"] -->|"Build Highlights"| DETECT["Detect or Generate Target Text Box"]
-    DETECT -->|"1. Align Anchor Point"| ALIGN["Anchor Alignment via Justification (Zero Visual Shift)"]
-    ALIGN -->|"2. Inspector Effects"| FX["Attach Typography Properties Effects (Box Size, Text Size, Alignment)"]
-    FX -->|"3. Mark Guideline"| GUIDE["Hide Original Text Box as Guideline (guideLayer=true, enabled=false)"]
-    GUIDE -->|"4. Line & Word Splitting"| SPLIT["Split Lines into Independent Text Boxes (Top-Left Anchors)"]
-    SPLIT -->|"5. Procedural Vector Shapes"| SHAPE["Create Highlight Shape Layer (Top-Left Anchors, Parented to Original)"]
-    SHAPE -->|"Color Linking"| COLOR["Interactive Color Pickers (Highlight Fill + Highlighted Text Color)"]
+    UI["ScriptUI Panel (v2.0.0)"] --> METHOD{"Highlight Engine Selector (Top of UI)"}
     
-    SHAPE --> OPT{"Make Precomp?"}
-    OPT -->|"Yes"| PRE["Precompose Created Layers -> Mirror Master Effects -> Expression Link"]
-    OPT -->|"No"| RIG["Direct Child Hierarchy Parented to Original Text Layer"]
+    subgraph SPLIT["1. Split Method (Layer Decomposition)"]
+        S1["Align Original Anchor to Justification (Zero Shift)"] --> S2["Attach Typography Inspector Effects"]
+        S2 --> S3["Mark Original Layer as Hidden Guideline (guideLayer=true, enabled=false)"]
+        S3 --> S4["Split Target Lines & Words into Independent Boxes (Top-Left Anchors)"]
+        S4 --> S5["Create Vector Highlight Shape Layer (Top-Left Anchors, Parented to Original)"]
+        S5 --> S6["Expression-Link Target Text Color to Master Effect"]
+    end
     
-    UI -->|"Remove Highlights & Restore"| RESTORE["Delete Created Layers/Precomp & Restore Original Text Layer"]
+    subgraph CALC["2. Calculation Method (Intact Text Box)"]
+        C1["Align Original Anchor to Justification (Zero Shift)"] --> C2["Attach Typography Inspector Effects"]
+        C2 --> C3["Keep Original Text Layer Intact & Active (enabled=true, guideLayer=false)"]
+        C3 --> C4["Calculate In-Place Coordinates via Font Metrics & Delimiter Advance"]
+        C4 --> C5["Create Vector Highlight Shape Layer Directly Behind Text (Parented to Original)"]
+        C5 --> C6["Optional: Attach Native Text Animator for Highlighted Text Color"]
+    end
+    
+    METHOD -->|"Split Method"| SPLIT
+    METHOD -->|"Calculation Method"| CALC
+    
+    SPLIT --> PRECOMP{"Make Precomp?"}
+    CALC --> PRECOMP
+    
+    PRECOMP -->|"Yes"| MAKE_PRE["Precompose Rig -> Mirror Master Effects -> Expression Link"]
+    PRECOMP -->|"No"| ACTIVE["Active Timeline Hierarchy Parented to Original"]
+    
+    UI -->|"Remove Highlights & Restore"| RESTORE["Clean up Created Child Layers/Animators/Precomp & Restore Original Text Layer"]
     UI -->|"Create Dummy Text Box"| DUMMY["Procedural Dummy Text Box Generator"]
 ```
 
 ---
 
-## 🚀 What's New in v2.0.0
+## ⚡ Comparison: Split Method vs. Calculation Method
 
-### 1. Justification-Based Zero-Shift Anchor Alignment
-- **Knowledge Base**: [AE-Align-AnchorPoint](https://github.com/work2survive/AE-Align-AnchorPoint) & [AE_VS_JS_TEXT_RENDERING_DIFFERENCES.md](https://github.com/work2survive/AE_JS_builder/blob/main/AE_VS_JS_TEXT_RENDERING_DIFFERENCES.md).
-- Prior to decomposition, the original text box anchor point is aligned based on its justification:
+| Feature | ✂️ Split Method | 📐 Calculation Method |
+| :--- | :--- | :--- |
+| **Original Text Layer** | Preserved as hidden Guideline (`guideLayer=true, enabled=false`) | Completely intact and active (`enabled=true, guideLayer=false`) |
+| **Layer Decomposition** | Splits lines and target words into independent text box layers | **No splitting**; zero extra text layers created |
+| **Anchor Point Pinning** | Every split text box has anchor pinned strictly to **Top-Left** | Text layer anchor aligned to justification with zero shift |
+| **Position Calculation** | Delimiter-anchored advance positioning per segment | In-place mathematical calculation from font metrics and advance |
+| **Highlight Shape Layer** | Vector shape layer parented to original, top-left anchor boxes | Vector shape layer parented to original, positioned behind text |
+| **Text Color Override** | Expression on `Source Text` of individual target text boxes | In-place via native AE Text Animator range selector |
+| **Precomp Option** | Precomposes split text boxes and highlight layer | Precomposes text layer and highlight layer |
+| **Restoration** | Deletes split layers/shapes, unhides and restores original text | Deletes shapes/animator, restores untouched original state |
+| **Best Used For** | Kinetic typography, word animation, granular layer control | Static text layouts, rapid highlighting, pristine layer stacks |
+
+---
+
+## 🚀 Key Architectural Innovations
+
+### 1. Top-of-UI Highlight Method Switch
+- Located directly at the top of the interface:
+  - `✂️ Split Method (Decompose Lines & Words)`
+  - `📐 Calculation Method (Intact Text Box)`
+- Dynamically updates execution button labels, tooltips, and workflow hints.
+
+### 2. In-Place Font Parameter Calculation (Calculation Method)
+- Evaluates complete font metrics without modifying the text layer:
+  - `doc.fontSize`, `doc.leading` (or `fontSize * 1.2` auto-leading standard).
+  - `doc.tracking` converted to font advance offset ($\Delta x = \frac{\text{tracking}}{1000} \times \text{fontSize}$).
+  - `doc.boxTextPos` coordinate mapping for Paragraph Text layers.
+  - Sub-pixel delimiter-anchored advance (`measurer.measurePrefixAdvance()`) capturing exact character kerning and whitespace advance across Georgia, Cambria, Arial, and all system typefaces.
+- Generates procedural rounded rectangles matching the exact bounding box of target words in layer local space.
+
+### 3. Justification-Based Zero-Shift Anchor Alignment
+- Prior to rigging, the text box anchor point is aligned based on its justification:
   - **Left Justified** $\to$ Top-Left
   - **Center Justified** $\to$ Top-Center
   - **Right Justified** $\to$ Top-Right
-- **Zero Visual Shift**: Compensates layer position simultaneously so the visual layout in the composition does not shift by even a fraction of a pixel.
+- Simultaneously compensates layer position so the visual layout in the composition does not shift by even a fraction of a pixel.
 
-### 2. Live Typography Inspector Effects Controls
-- **Knowledge Base**: [Text_Properties_To_Effects.jsx](https://github.com/work2survive/AE_JS_builder/blob/main/samples/Text_Properties_To_Effects.jsx).
-- Attaches live expression and slider controls to the original text layer:
-  - `Box Text Width`, `Box Text Height`
-  - `Text Width`, `Text Height`
-  - `Visual Center Offset`
-  - `Alignment Index` (`0=Left`, `1=Center`, `2=Right`)
-  - `Is Paragraph Box Text` (`1=Yes`, `0=No`)
-  - `Anchor Align X`, `Anchor Align Y`
+### 4. Dual Interactive Color Pickers
+- Vector swatch buttons and live hex editors for both:
+  - **Highlight Box Color**: Background fill of highlight shapes.
+  - **Highlighted Text Color**: Typography color of target words.
+- Supports native `$.colorPicker`, Windows OS picker, and simulator web color inputs.
 
-### 3. Visual Line & Word Splitting Engine
-- **Knowledge Base**: [AE_Text_Precomp.jsx](https://github.com/work2survive/AE_JS_builder/blob/main/samples/AE_Text_Precomp.jsx) / [AE-text-precomp](https://github.com/work2survive/AE-text-precomp).
-- Detects which visual lines contain highlighted target words:
-  - **Unhighlighted Lines**: Preserved as single independent text box layers (`[Line N]`).
-  - **Highlighted Lines**: Split into separate non-highlight text segments (`[HL-Text]`) and dedicated target word boxes (`[HL-Target]`).
-- **Top-Left Anchor Pinning**: All generated text boxes have their anchor point strictly assigned to Top-Left (`[r.left, r.top]`).
-- **Delimiter-Anchored Advance**: Positions words along the exact baseline using sub-pixel delimiter measurement (`measurer.measurePrefixAdvance()`), completely eliminating font-specific kerning drift across Georgia, Cambria, Arial, and other typefaces.
-
-### 4. Procedural Vector Highlight Shapes Layer
-- Creates a dedicated vector Shape Layer (`OriginalName - Highlights`) parented to the original text layer.
-- Builds a procedural rounded rectangle for each highlighted word box:
-  - Anchor point pinned to Top-Left.
-  - Size dynamically expression-linked to `Padding X` and `Thickness Y`.
-  - Position dynamically expression-linked to `Offset X` and `Offset Y`.
-  - Corner radius dynamically expression-linked to `Roundness`.
-  - Fill color dynamically expression-linked to `Highlight Color`.
-  - Opacity dynamically expression-linked to `Highlight Opacity`.
-- Automatically expressions the `Source Text` fill color of `[HL-Target]` text layers to match the `Highlighted Text Color` master control.
-
-### 5. Dual Interactive Color Pickers
-- **Knowledge Base**: [custom_rounded_rect.jsx](https://github.com/work2survive/AE_JS_builder/blob/main/jsx/custom_rounded_rect.jsx).
-- Interactive vector swatch buttons and hex editors:
-  - **Highlight Box Color**: Controls the background fill of the highlight shapes.
-  - **Highlighted Text Color**: Controls the typography color of the target words.
-- Supports native `$.colorPicker`, Windows OS picker, and browser color input in simulator mode.
-
-### 6. Mirrored Precomposition Option
+### 5. Mirrored Precomposition Option
 - **"Make Precomp Out of Rig"**:
-  - Precomposes all created split text layers and the highlight shape layer.
-  - Automatically mirrors all master effect controls onto the precomp layer in the main composition.
+  - Automatically mirrors all master effect controls onto the precomp layer in the parent composition.
   - Expression-links inner shape effects directly back to the parent precomp layer (`comp("Main Comp").layer("Precomp Layer").effect("...")`).
-  - Parents the precomp layer to the hidden guideline original text box.
+  - Parents the precomp layer to the original text box.
 
-### 7. Non-Destructive "Remove Highlights & Restore"
-- Cleans up all child layers (`[Line N]`, `[HL-Text]`, `[HL-Target]`, `- Highlights`, and precomp layers).
-- Restores the original text layer to its fully active state (`guideLayer = false`, `enabled = true`) and selects it.
-
-### 8. Dedicated "Create Dummy Text Box" Testing Generator
-- Tabbed controls with customizable **Font** (`Georgia`, `Arial`, `Cambria`, etc.) and **Justification** (`Left`, `Center`, `Right`).
-- Generates a 950x450 paragraph box text layer with realistic multiline text ready for testing.
+### 6. Universal "Remove Highlights & Restore"
+- One-click non-destructive clean-up:
+  - Scans and deletes all generated child layers (`[Line N]`, `[HL-Text]`, `[HL-Target]`, `- Highlights`, precomp layers).
+  - Removes any added Text Animators on intact text layers.
+  - Restores the original text layer (`guideLayer = false`, `enabled = true`) to active selection.
 
 ---
 
@@ -100,18 +132,20 @@ flowchart TD
 
 | Control | Location | Description | Default |
 | :--- | :--- | :--- | :--- |
-| **Highlight Targets** | Main Panel | Multiline textarea for words, phrases, or sentences to highlight. | Auto-sampled |
+| **Highlight Engine** | Top Header | Switch between **Split Method** and **Calculation Method**. | Split Method |
+| **Highlight Targets** | Main Panel | Multiline textarea for target words, phrases, or sentences. | Auto-sampled |
 | **Highlight Color** | Main Panel | Interactive swatch & hex editor for highlight box fill. | `#FF296D` (Hot Pink) |
 | **Text Color** | Main Panel | Interactive swatch & hex editor for highlighted word text. | `#FFFFFF` (White) |
 | **Make Precomp Out of Rig** | Main Panel | Precomposes created layers with mirrored master effect controls. | `false` |
 | **Padding X** | Geometry Panel | Horizontal padding on left and right of highlight boxes. | `6 px` |
 | **Thickness Y** | Geometry Panel | Vertical expansion of highlight boxes. | `4 px` |
 | **Roundness** | Geometry Panel | Corner radius for highlight boxes (0 = square, >0 = pill/capsule). | `6 px` |
-| **Offset X / Y** | Geometry Panel | Fine-tuning position offsets. | `0 px` |
+| **Offset X / Y** | Geometry Panel | Fine-tuning position offsets in pixels. | `0 px` |
 | **Opacity** | Geometry Panel | Fill opacity from 0% to 100%. | `100%` |
-| **Create Dummy Text Box** | Advanced Tab | Generates paragraph box text for testing with custom font & align. | Action |
+| **Create Dummy Text Box** | Advanced Tab | Generates a 950×450 paragraph box text layer for testing. | Action |
+| **Knowledge Base Links** | Advanced Tab | Direct links to all architectural guides and repositories. | Reference |
 | **Remove Highlights** | Footer | Deletes generated rig layers / precomp and restores original text box. | Action |
-| **Build Highlights** | Footer | Executes anchor alignment, line/word splitting, and procedural rigging. | Action |
+| **Build Highlights** | Footer | Executes anchor alignment and builds highlights with selected method. | Action |
 
 ---
 
