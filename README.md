@@ -113,17 +113,19 @@ flowchart TD
   - **Right Justified** $\to$ Top-Right
 - Simultaneously compensates layer position so the visual layout in the composition does not shift by even a fraction of a pixel.
 
-### 4. Dual Interactive Color Pickers
-- Vector swatch buttons and live hex editors for both:
-  - **Highlight Box Color**: Background fill of highlight shapes.
-  - **Highlighted Text Color**: Typography color of target words.
+### 4. Interactive Color Pickers & Selective Text Coloring Toggle
+- **Highlight Box Fill**: Swatch button and hex editor for highlight vector shapes.
+- **Highlighted Text Color Checkbox & Picker**:
+  - Preceded by a dedicated toggle checkbox (`[x] Highlighted Text Color:`).
+  - **When Enabled**: Only the font of words directly associated with the highlights changes color (via `Source Text` expressions in Split Method and range-specific Text Selectors targeting character index intervals in Calculation Method). All non-highlighted words strictly retain their original font color.
+  - **When Disabled**: Keeps original typography font colors 100% untouched across all characters in the text box. The color swatch and hex input are dynamically disabled and dimmed.
 - Supports native `$.colorPicker`, Windows OS picker, and simulator web color inputs.
 
 ### 5. Mirrored Precomposition Option
 - **"Make Precomp Out of Rig"**:
   - Sets precomposition dimensions strictly to the original text box size (`width = boxWidth, height = boxHeight`).
   - Enables Continuous Rasterization / Collapse Transformations (`collapseTransformation = true`) so vector highlight padding/thickness renders with razor-sharp vector fidelity without boundary clipping.
-  - Automatically mirrors all master effect controls onto the precomp layer in the parent composition.
+  - Automatically mirrors all master effect controls (including `Change Highlighted Text Color` checkbox control) onto the precomp layer in the parent composition.
   - Expression-links inner shape effects directly back to the parent precomp layer (`comp("Main Comp").layer("Precomp Layer").effect("...")`).
   - Maintains 0.00px visual shift with affine coordinate compensation.
 
@@ -149,8 +151,8 @@ flowchart TD
 | :--- | :--- | :--- | :--- |
 | **Highlight Engine** | Top Header | Switch between **Split Method** and **Calculation Method**. | Split Method |
 | **Highlight Targets** | Main Panel | Multiline textarea for target words, phrases, or sentences. | Auto-sampled |
-| **Highlight Color** | Main Panel | Interactive swatch & hex editor for highlight box fill. | `#FF296D` (Hot Pink) |
-| **Text Color** | Main Panel | Interactive swatch & hex editor for highlighted word text. | `#FFFFFF` (White) |
+| **Highlight Box Fill** | Appearance Tab | Interactive swatch & hex editor for highlight box fill. | `#FF2A6D` (Hot Pink) |
+| **Highlighted Text Color** | Appearance Tab | Toggle checkbox and color picker for target word font color. When unchecked, original font color is preserved. | `Checked`, `#FFFFFF` |
 | **Make Precomp Out of Rig** | Main Panel | Precomposes created layers with mirrored master effect controls. | `false` |
 | **Padding X** | Geometry Panel | Horizontal padding on left and right of highlight boxes. | `6 px` |
 | **Thickness Y** | Geometry Panel | Vertical expansion of highlight boxes. | `4 px` |
