@@ -139,6 +139,9 @@ flowchart TD
 
 ### 7. Stochastic Dummy Text Generator
 - Rapid one-click test generation with comprehensive multi-parameter randomization:
+  - **Wider Composition Span**: Generated text dynamically spans **76% to 88%** of the composition width (e.g. 1450–1690 px on a 1920×1080 viewport) with balanced lateral margins.
+  - **Randomized Point Text vs. Box Text**: Randomizes whether the layer is instantiated as **Paragraph (Box) Text** (`doc.boxText = true` with wide box dimensions) or **Point Text** (`doc.boxText = false`).
+  - **Viewport-Safe Line Breaks for Point Text**: When Point Text is selected, automatically calculates maximum characters per line from viewport width and typographic character advance, inserting soft returns (`\r`) at natural word boundaries so text never extends past composition edges or sticks out of the viewport.
   - **Randomized Font**: Shuffles across typical typefaces (Georgia, Cambria, Arial, Helvetica, Times New Roman, Verdana, Trebuchet MS, Courier New).
   - **Randomized Font Size ($\pm 15\%$)**: Selects size in the range 29–39 pt (from 34 pt base).
   - **Randomized Leading ($\pm 15\%$)**: Adjusts vertical line spacing proportionally.
