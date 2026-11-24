@@ -13,7 +13,6 @@
 
 > [!IMPORTANT]
 > **Key Enhancements in v2.1.1**:
-> - **Strict Separation of Randomization**: Randomization (font, size ±15%, leading ±15%, text colors, point vs. box text, line wrapping) is strictly confined to "Create Dummy Text Box". "Build Highlights" strictly honors user-selected text layers and input targets without unwanted auto-randomization.
 > - **Selective Highlight Text Coloring**: Highlight box fill strictly changes only the color of the font related to highlights (via Range Selectors in Calculation Method and segment targets in Split Method). Non-highlighted text retains original font color.
 > - **Highlighted Text Color Checkbox Toggle**: Added a dedicated checkbox before "Highlighted Text Color:" to enable/disable font color overrides. When unchecked, original font colors remain 100% untouched.
 > - **Mandatory First-Action Anchor Alignment**: Always aligns the text layer anchor point to **Top-Left** using `AE_Align_Anchor_Point.jsx` logic with **0.00px visual shift**, regardless of method selected.
@@ -72,7 +71,6 @@ flowchart TD
     PRECOMP -->|"No"| ACTIVE["Active Timeline Hierarchy Parented to Original"]
     
     UI -->|"Remove Highlights & Restore"| RESTORE["Clean up Created Child Layers/Animators/Precomp & Restore Original Text Layer"]
-    UI -->|"Create Dummy Text Box"| DUMMY["Procedural Dummy Text Box Generator"]
 ```
 
 ---
@@ -138,17 +136,6 @@ flowchart TD
   - Removes any added Text Animators on intact text layers.
   - Restores the original text layer (`guideLayer = false`, `enabled = true`) to active selection.
 
-### 7. Stochastic Dummy Text Generator
-- Rapid one-click test generation with comprehensive multi-parameter randomization:
-  - **Wider Composition Span**: Generated text dynamically spans **76% to 88%** of the composition width (e.g. 1450–1690 px on a 1920×1080 viewport) with balanced lateral margins.
-  - **Randomized Point Text vs. Box Text**: Randomizes whether the layer is instantiated as **Paragraph (Box) Text** (`doc.boxText = true` with wide box dimensions) or **Point Text** (`doc.boxText = false`).
-  - **Viewport-Safe Line Breaks for Point Text**: When Point Text is selected, automatically calculates maximum characters per line from viewport width and typographic character advance, inserting soft returns (`\r`) at natural word boundaries so text never extends past composition edges or sticks out of the viewport.
-  - **Randomized Font**: Shuffles across typical typefaces (Georgia, Cambria, Arial, Helvetica, Times New Roman, Verdana, Trebuchet MS, Courier New).
-  - **Randomized Font Size ($\pm 15\%$)**: Selects size in the range 29–39 pt (from 34 pt base).
-  - **Randomized Leading ($\pm 15\%$)**: Adjusts vertical line spacing proportionally.
-  - **Randomized Text Color**: Shuffles across vibrant, high-contrast aesthetic palettes and bright hues.
-  - **Randomized Alignment**: Shuffles between Left, Center, and Right paragraph justifications.
-
 ---
 
 ## 🛠️ ScriptUI Controls Reference
@@ -165,7 +152,6 @@ flowchart TD
 | **Roundness** | Geometry Panel | Corner radius for highlight boxes (0 = square, >0 = pill/capsule). | `6 px` |
 | **Offset X / Y** | Geometry Panel | Fine-tuning position offsets in pixels. | `0 px` |
 | **Opacity** | Geometry Panel | Fill opacity from 0% to 100%. | `100%` |
-| **Create Dummy Text Box** | Advanced Tab | Generates a 950×450 paragraph box text layer with customizable or randomized alignment (Left, Center, Right) for testing. | Action |
 | **Knowledge Base Links** | Advanced Tab | Direct links to all architectural guides and repositories. | Reference |
 | **Remove Highlights** | Footer | Deletes generated rig layers / precomp and restores original text box. | Action |
 | **Build Highlights** | Footer | Executes anchor alignment and builds highlights with selected method. | Action |
