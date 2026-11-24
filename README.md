@@ -102,22 +102,46 @@ flowchart TD
   - `📐 Calculation Method (Intact Text Box)`
 - Dynamically updates execution button labels, tooltips, and workflow hints.
 
-### 2. In-Place Font Parameter Calculation (Calculation Method)
-- Evaluates complete font metrics without modifying the text layer:
+### 2. In-Place Sub-Pixel Geometry Engine (Calculation Method)
+- Evaluates complete font metrics and geometry without decomposing the text layer:
   - `doc.fontSize`, `doc.leading` (or `fontSize * 1.2` auto-leading standard).
   - `doc.tracking` converted to font advance offset ($\Delta x = \frac{\text{tracking}}{1000} \times \text{fontSize}$).
   - `doc.boxTextPos` coordinate mapping for Paragraph Text layers.
   - Sub-pixel delimiter-anchored advance (`measurer.measurePrefixAdvance()`) capturing exact character kerning and whitespace advance across Georgia, Cambria, Arial, and all system typefaces.
 - Generates procedural rounded rectangles matching the exact bounding box of target words in layer local space.
 
-### 3. Justification-Based Zero-Shift Anchor Alignment
-- Prior to rigging, the text box anchor point is aligned based on its justification:
-  - **Left Justified** $\to$ Top-Left
-  - **Center Justified** $\to$ Top-Center
-  - **Right Justified** $\to$ Top-Right
-- Simultaneously compensates layer position so the visual layout in the composition does not shift by even a fraction of a pixel.
+### 3. Mandatory Top-Left Zero-Shift Anchor Alignment
+- Prior to rigging, the text box anchor point is aligned strictly to **Top-Left** bounds (`[sRect.left, sRect.top]`) matching `AE_Align_Anchor_Point.jsx`.
+- Simultaneously compensates layer position so the visual layout in the composition does not shift by even 0.001 of a pixel:
+  - Preserves 3D depth vector `curPos[2]` and `curA[2]` without 2D flattening.
+  - Includes an alignment delta threshold guard (`Math.abs(deltaAx) < 0.001 && Math.abs(deltaAy) < 0.001`) preventing drift accumulation when scripts re-run.
 
-### 4. Interactive Color Pickers & Selective Text Coloring Toggle
+### 4. Calculation Method Coordinate Geometry & Mathematical Proofs
+
+#### The Parent Coordinate System Trap (Eliminating Double-Offsetting)
+When a child procedural Shape Layer (`shapeLayer`) is parented to `textLayer` with `position = [0, 0, 0]`, After Effects sets the child's local origin $(0, 0)$ **directly at the parent's anchor point**:
+1. **Vertical Ascender Double-Offsetting**:
+   In Point Text, `sourceRectAtTime().top` is negative ($-\text{ascender} \approx -0.78 \times \text{fontSize}$). Since the parent anchor point was moved to `sRect.top`, the top boundary of the text block is already at $y = 0$ in parent space.
+   Subtracting $\text{ascender}$ a second time causes highlight shapes to float in the air above the text. The correct vertical center of the highlight pill is simply:
+   $$\text{boxCenterY} = \text{lineTop} + \frac{\text{boxHeight}}{2} = (\text{lineIndex} \times \text{lineStep}) + \frac{\text{fontSize}}{2}$$
+2. **Horizontal Justification Double-Offsetting**:
+   In Center/Right justified Point text, `sRect.left` already accounts for negative expansion. Line coordinates must be computed relative to the content boundary:
+   $$\text{contentWidth} = \begin{cases} \text{doc.boxTextSize}[0] & \text{if Paragraph Box Text} \\ \text{sRect.width} & \text{if Point Text} \end{cases}$$
+   $$\text{lineLeft} = \begin{cases} 0 & \text{if Left Justified} \\ \frac{\text{contentWidth} - \text{lineWidth}}{2} & \text{if Center Justified} \\ \text{contentWidth} - \text{lineWidth} & \text{if Right Justified} \end{cases}$$
+   $$\text{boxCenterX} = \text{lineLeft} + \text{startAdv} + \frac{\text{termWidth}}{2}$$
+
+#### Delimiter-Anchored Differential Word Advance
+ExtendScript's `sourceRectAtTime()` strips trailing whitespace. Measuring words in isolation ignores whitespace, kerning ligatures, and contextual tracking deltas. To measure exact sub-pixel boundaries:
+1. Append pipe delimiter (`"|"`) to prefix: $\text{adv}_{\text{raw}} = \text{measure}(\text{prefix} + \text{"|"}).\text{width}$.
+2. Subtract delimiter width: $\text{startAdv} = \text{adv}_{\text{raw}} - \text{measure}(\text{"|"}).\text{width}$.
+3. Calculate differential word width: $\text{termWidth} = \text{endAdv} - \text{startAdv}$.
+4. **Emoji Immunity**: Handles multi-byte Unicode emoji surrogate pairs (e.g. `🎨`, `💎`, `🎸`) without index corruption.
+
+#### 3D Parallax & Depth Invariance
+- If `textLayer.threeDLayer === true`, `shapeLayer.threeDLayer` is automatically set to `true`.
+- Compares 3-element `[x, y, z]` arrays throughout transform operations, ensuring 3D camera depth (e.g. `Z: -53px`) is 100% preserved.
+
+### 5. Interactive Color Pickers & Selective Text Coloring Toggle
 - **Highlight Box Fill**: Swatch button and hex editor for highlight vector shapes.
 - **Highlighted Text Color Checkbox & Picker**:
   - Preceded by a dedicated toggle checkbox (`[x] Highlighted Text Color:`).
@@ -125,7 +149,7 @@ flowchart TD
   - **When Disabled**: Keeps original typography font colors 100% untouched across all characters in the text box. The color swatch and hex input are dynamically disabled and dimmed.
 - Supports native `$.colorPicker`, Windows OS picker, and simulator web color inputs.
 
-### 5. Mirrored Precomposition Option
+### 6. Mirrored Precomposition Option
 - **"Make Precomp Out of Rig"**:
   - Sets precomposition dimensions strictly to the original text box size (`width = boxWidth, height = boxHeight`).
   - Enables Continuous Rasterization / Collapse Transformations (`collapseTransformation = true`) so vector highlight padding/thickness renders with razor-sharp vector fidelity without boundary clipping.
@@ -133,7 +157,7 @@ flowchart TD
   - Expression-links inner shape effects directly back to the parent precomp layer (`comp("Main Comp").layer("Precomp Layer").effect("...")`).
   - Maintains 0.00px visual shift with affine coordinate compensation.
 
-### 6. Universal "Remove Highlights & Restore"
+### 7. Universal "Remove Highlights & Restore"
 - One-click non-destructive clean-up:
   - Scans and deletes all generated child layers (`[Line N]`, `[HL-Text]`, `[HL-Target]`, `- Highlights`, precomp layers).
   - Removes any added Text Animators on intact text layers.
