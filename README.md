@@ -1,4 +1,4 @@
-# AE Text Highlight (v2.1.2)
+# AE Text Highlight (v2.2.0)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -7,20 +7,19 @@
 
 **Live Demo**: [https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 
-**AE Text Highlight v2.1.2** is an advanced procedural typography highlighting and rigging engine for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/). It features a top-level engine selector allowing users to choose between two distinct highlight strategies:
+**AE Text Highlight v2.2.0** is an advanced procedural typography highlighting and rigging engine for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/). It features a top-level engine selector allowing users to choose between two distinct highlight strategies:
 1. **Split Method (Layer Decomposition)**: Decomposes target lines and words into independent text boxes with top-left anchor points, offering individual text layer control, separate text color assignments, and sub-pixel alignment.
 2. **Calculation Method (Intact Text Box)**: Keeps the original text layer completely intact without splitting, calculating the exact geometric coordinates and bounding sizes of highlight boxes in-place using all available typography parameters (`fontSize`, `leading`, `tracking`, `boxTextPos`, `sourceRectAtTime`, and delimiter-anchored advance).
 
 > [!IMPORTANT]
-> **Key Enhancements in v2.1.2**:
+> **Key Enhancements in v2.2.0**:
+> - **Configurable Target Separator Engine**: Separator dropdown supporting `↵ Newline (1 per line)`, `| Pipe ( | )`, `; Semicolon ( ; )`, `, Comma (legacy)`, and `Custom...`.
+> - **Sentences with Commas 100% Preserved**: Highlights full multi-word sentences and clauses containing internal commas (e.g. `"Slow living, peace of mind, body, and soul"`) without unwanted fragment splitting.
+> - **One-Click Delimiter Action Buttons**: Added `+ ↵ Line`, `+ | Pipe`, and `+ Add Separator` buttons right above the targets textarea for instant delimiter insertion at the cursor.
 > - **Robust Text Layer Selection**: Added parent hierarchy traversal so selecting child indicator/helper layers (e.g., Anchor Cross created in simulators) seamlessly resolves to the parent text layer.
 > - **Unified Footer UI**: Moved GitHub repository link to bottom panel footer matching `AE_Text_Precomp.jsx` styling.
-> - **Simulator Compatibility**: Fully verified against AE JS Builder emulator and timeline layer management.
-> - **Selective Highlight Text Coloring**: Highlight box fill strictly changes only the color of the font related to highlights (via Range Selectors in Calculation Method and segment targets in Split Method). Non-highlighted text retains original font color.
-> - **Highlighted Text Color Checkbox Toggle**: Added a dedicated checkbox before "Highlighted Text Color:" to enable/disable font color overrides. When unchecked, original font colors remain 100% untouched.
 > - **Mandatory First-Action Anchor Alignment**: Always aligns the text layer anchor point to **Top-Left** using `AE_Align_Anchor_Point.jsx` logic with **0.00px visual shift**, regardless of method selected.
-> - **Eliminated Upward Shift in Split Method**: Line 1 baseline is strictly calibrated from typographic ascender (matching `AE_Text_Precomp`), preventing glyphs from ascending into negative space.
-> - **Precomp Anchor Point & Size Normalization**: Precomp layer anchor point is pinned strictly to **Top-Left** (`[0, 0, 0]`) and dimensions match the text box dimensions, eliminating baseline offsets.
+> - **Selective Highlight Text Coloring**: Highlight box fill strictly changes only the color of the font related to highlights (via Range Selectors in Calculation Method and segment targets in Split Method). Non-highlighted text retains original font color.
 
 ---
 
@@ -170,6 +169,10 @@ ExtendScript's `sourceRectAtTime()` strips trailing whitespace. Measuring words 
 | Control | Location | Description | Default |
 | :--- | :--- | :--- | :--- |
 | **Highlight Engine** | Top Header | Switch between **Split Method** and **Calculation Method**. | Split Method |
+| **Separator Mode** | Main Panel | Choose delimiter: `↵ Newline (1 per line)`, `\| Pipe ( \| )`, `; Semicolon ( ; )`, `, Comma`, or `Custom...`. Preserves sentences with commas. | `↵ Newline` |
+| **+ Separator Button** | Main Panel | Dynamically inserts the active delimiter (`\n`, ` \| `, `; `, `, `) into targets at cursor. | Button |
+| **+ \| (Pipe) Button** | Main Panel | Inserts ` \| ` and sets separator to Pipe mode (commas in sentences safe). | Button |
+| **+ ↵ (Line) Button** | Main Panel | Inserts newline and sets separator to Newline mode (commas in sentences safe). | Button |
 | **Highlight Targets** | Main Panel | Multiline textarea for target words, phrases, or sentences. | Auto-sampled |
 | **Highlight Box Fill** | Appearance Tab | Interactive swatch & hex editor for highlight box fill. | `#FF2A6D` (Hot Pink) |
 | **Highlighted Text Color** | Appearance Tab | Toggle checkbox and color picker for target word font color. When unchecked, original font color is preserved. | `Checked`, `#FFFFFF` |
