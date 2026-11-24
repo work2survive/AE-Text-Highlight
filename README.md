@@ -1,4 +1,4 @@
-# AE Text Highlight (v2.1.1)
+# AE Text Highlight (v2.1.2)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -7,12 +7,15 @@
 
 **Live Demo**: [https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 
-**AE Text Highlight v2.1.1** is an advanced procedural typography highlighting and rigging engine for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/). It features a top-level engine selector allowing users to choose between two distinct highlight strategies:
+**AE Text Highlight v2.1.2** is an advanced procedural typography highlighting and rigging engine for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/). It features a top-level engine selector allowing users to choose between two distinct highlight strategies:
 1. **Split Method (Layer Decomposition)**: Decomposes target lines and words into independent text boxes with top-left anchor points, offering individual text layer control, separate text color assignments, and sub-pixel alignment.
 2. **Calculation Method (Intact Text Box)**: Keeps the original text layer completely intact without splitting, calculating the exact geometric coordinates and bounding sizes of highlight boxes in-place using all available typography parameters (`fontSize`, `leading`, `tracking`, `boxTextPos`, `sourceRectAtTime`, and delimiter-anchored advance).
 
 > [!IMPORTANT]
-> **Key Enhancements in v2.1.1**:
+> **Key Enhancements in v2.1.2**:
+> - **Robust Text Layer Selection**: Added parent hierarchy traversal so selecting child indicator/helper layers (e.g., Anchor Cross created in simulators) seamlessly resolves to the parent text layer.
+> - **Unified Footer UI**: Moved GitHub repository link to bottom panel footer matching `AE_Text_Precomp.jsx` styling.
+> - **Simulator Compatibility**: Fully verified against AE JS Builder emulator and timeline layer management.
 > - **Selective Highlight Text Coloring**: Highlight box fill strictly changes only the color of the font related to highlights (via Range Selectors in Calculation Method and segment targets in Split Method). Non-highlighted text retains original font color.
 > - **Highlighted Text Color Checkbox Toggle**: Added a dedicated checkbox before "Highlighted Text Color:" to enable/disable font color overrides. When unchecked, original font colors remain 100% untouched.
 > - **Mandatory First-Action Anchor Alignment**: Always aligns the text layer anchor point to **Top-Left** using `AE_Align_Anchor_Point.jsx` logic with **0.00px visual shift**, regardless of method selected.
@@ -44,7 +47,7 @@ The algorithms and architecture in this engine are derived from and cross-refere
 
 ```mermaid
 flowchart TD
-    UI["ScriptUI Panel (v2.1.1)"] --> FIRST["Mandatory First Action: Align Text Layer Anchor to Top-Left (AE_Align_Anchor_Point.jsx)"]
+    UI["ScriptUI Panel (v2.1.2)"] --> FIRST["Mandatory First Action: Align Text Layer Anchor to Top-Left (AE_Align_Anchor_Point.jsx)"]
     FIRST --> METHOD{"Highlight Engine Selector"}
     
     subgraph SPLIT["1. Split Method (Layer Decomposition)"]
