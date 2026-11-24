@@ -133,6 +133,14 @@ flowchart TD
   - Removes any added Text Animators on intact text layers.
   - Restores the original text layer (`guideLayer = false`, `enabled = true`) to active selection.
 
+### 7. Stochastic Dummy Text Generator
+- Rapid one-click test generation with comprehensive multi-parameter randomization:
+  - **Randomized Font**: Shuffles across typical typefaces (Georgia, Cambria, Arial, Helvetica, Times New Roman, Verdana, Trebuchet MS, Courier New).
+  - **Randomized Font Size ($\pm 15\%$)**: Selects size in the range 29–39 pt (from 34 pt base).
+  - **Randomized Leading ($\pm 15\%$)**: Adjusts vertical line spacing proportionally.
+  - **Randomized Text Color**: Shuffles across vibrant, high-contrast aesthetic palettes and bright hues.
+  - **Randomized Alignment**: Shuffles between Left, Center, and Right paragraph justifications.
+
 ---
 
 ## 🛠️ ScriptUI Controls Reference
