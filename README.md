@@ -1,4 +1,4 @@
-# AE Text Highlight (v2.0.0)
+# AE Text Highlight (v2.1.0)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -7,9 +7,15 @@
 
 **Live Demo**: [https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 
-**AE Text Highlight v2.0.0** is an advanced procedural typography highlighting and rigging engine for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/). It features a top-level engine selector allowing users to choose between two distinct highlight strategies:
+**AE Text Highlight v2.1.0** is an advanced procedural typography highlighting and rigging engine for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/). It features a top-level engine selector allowing users to choose between two distinct highlight strategies:
 1. **Split Method (Layer Decomposition)**: Decomposes target lines and words into independent text boxes with top-left anchor points, offering individual text layer control, separate text color assignments, and sub-pixel alignment.
 2. **Calculation Method (Intact Text Box)**: Keeps the original text layer completely intact without splitting, calculating the exact geometric coordinates and bounding sizes of highlight boxes in-place using all available typography parameters (`fontSize`, `leading`, `tracking`, `boxTextPos`, `sourceRectAtTime`, and delimiter-anchored advance).
+
+> [!IMPORTANT]
+> **Key Enhancements in v2.1.0**:
+> - **Mandatory First-Action Anchor Alignment**: Always aligns the text layer anchor point to **Top-Left** using `AE_Align_Anchor_Point.jsx` logic with **0.00px visual shift**, regardless of method selected.
+> - **Eliminated Upward Shift in Split Method**: Line 1 baseline is strictly calibrated from typographic ascender (matching `AE_Text_Precomp`), preventing glyphs from ascending into negative space.
+> - **Precomp Anchor Point & Size Normalization**: Precomp layer anchor point is pinned strictly to **Top-Left** (`[0, 0, 0]`) and dimensions match the text box dimensions, eliminating baseline offsets.
 
 ---
 
@@ -20,7 +26,7 @@ The algorithms and architecture in this engine are derived from and cross-refere
 1. **[AE vs. JS Text Rendering Differences Guide](https://github.com/work2survive/AE_JS_builder/blob/main/AE_VS_JS_TEXT_RENDERING_DIFFERENCES.md)**:
    - Comprehensive analysis of After Effects typography engine mechanics: Point Text vs. Paragraph (Box) Text coordinates, `boxTextPos` mapping, justification geometry, ascender-to-descender ratios, tracking conversion ($1/1000\text{ em}$), and delimiter-anchored space measurement.
 2. **[AE Align Anchor Point](https://github.com/work2survive/AE-Align-AnchorPoint)**:
-   - Mathematical algorithm for justification-based anchor point alignment (Left $\to$ Top-Left, Center $\to$ Top-Center, Right $\to$ Top-Right) with simultaneous position compensation guaranteeing **0.00px visual shift**.
+   - Mathematical algorithm for mandatory first-action anchor point alignment (Top-Left) with simultaneous position compensation guaranteeing **0.00px visual shift**.
 3. **[Text & Box Properties to Effects](https://github.com/work2survive/AE_JS_builder/blob/main/samples/Text_Properties_To_Effects.jsx)**:
    - Real-time typography inspector attaching live effect controls (`Box Text Width`, `Box Text Height`, `Text Width`, `Text Height`, `Visual Center Offset`, `Alignment Index`, `Is Paragraph Box Text`, `Anchor Align X/Y`) to the text layer.
 4. **[AE Text Precomp (Zero-Shift Precomposition)](https://github.com/work2survive/AE_JS_builder/blob/main/samples/AE_Text_Precomp.jsx) / [AE-text-precomp](https://github.com/work2survive/AE-text-precomp)**:
@@ -36,22 +42,21 @@ The algorithms and architecture in this engine are derived from and cross-refere
 
 ```mermaid
 flowchart TD
-    UI["ScriptUI Panel (v2.0.0)"] --> METHOD{"Highlight Engine Selector (Top of UI)"}
+    UI["ScriptUI Panel (v2.1.0)"] --> FIRST["Mandatory First Action: Align Text Layer Anchor to Top-Left (AE_Align_Anchor_Point.jsx)"]
+    FIRST --> METHOD{"Highlight Engine Selector"}
     
     subgraph SPLIT["1. Split Method (Layer Decomposition)"]
-        S1["Align Original Anchor to Justification (Zero Shift)"] --> S2["Attach Typography Inspector Effects"]
-        S2 --> S3["Mark Original Layer as Hidden Guideline (guideLayer=true, enabled=false)"]
-        S3 --> S4["Split Target Lines & Words into Independent Boxes (Top-Left Anchors)"]
-        S4 --> S5["Create Vector Highlight Shape Layer (Top-Left Anchors, Parented to Original)"]
-        S5 --> S6["Expression-Link Target Text Color to Master Effect"]
+        S1["Attach Typography Inspector Effects"] --> S2["Mark Original Layer as Hidden Guideline (guideLayer=true, enabled=false)"]
+        S2 --> S3["Split Target Lines & Words into Independent Boxes (Top-Left Anchors)"]
+        S3 --> S4["Create Vector Highlight Shape Layer (Top-Left Anchors, Parented to Original)"]
+        S4 --> S5["Expression-Link Target Text Color to Master Effect"]
     end
     
     subgraph CALC["2. Calculation Method (Intact Text Box)"]
-        C1["Align Original Anchor to Justification (Zero Shift)"] --> C2["Attach Typography Inspector Effects"]
-        C2 --> C3["Keep Original Text Layer Intact & Active (enabled=true, guideLayer=false)"]
-        C3 --> C4["Calculate In-Place Coordinates via Font Metrics & Delimiter Advance"]
-        C4 --> C5["Create Vector Highlight Shape Layer Directly Behind Text (Parented to Original)"]
-        C5 --> C6["Optional: Attach Native Text Animator for Highlighted Text Color"]
+        C1["Attach Typography Inspector Effects"] --> C2["Keep Original Text Layer Intact & Active (enabled=true, guideLayer=false)"]
+        C2 --> C3["Calculate In-Place Coordinates via Font Metrics & Delimiter Advance"]
+        C3 --> C4["Create Vector Highlight Shape Layer Directly Behind Text (Parented to Original)"]
+        C4 --> C5["Optional: Attach Native Text Animator for Highlighted Text Color"]
     end
     
     METHOD -->|"Split Method"| SPLIT
