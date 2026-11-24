@@ -13,6 +13,7 @@
 
 > [!IMPORTANT]
 > **Key Enhancements in v2.1.1**:
+> - **Strict Separation of Randomization**: Randomization (font, size ±15%, leading ±15%, text colors, point vs. box text, line wrapping) is strictly confined to "Create Dummy Text Box". "Build Highlights" strictly honors user-selected text layers and input targets without unwanted auto-randomization.
 > - **Selective Highlight Text Coloring**: Highlight box fill strictly changes only the color of the font related to highlights (via Range Selectors in Calculation Method and segment targets in Split Method). Non-highlighted text retains original font color.
 > - **Highlighted Text Color Checkbox Toggle**: Added a dedicated checkbox before "Highlighted Text Color:" to enable/disable font color overrides. When unchecked, original font colors remain 100% untouched.
 > - **Mandatory First-Action Anchor Alignment**: Always aligns the text layer anchor point to **Top-Left** using `AE_Align_Anchor_Point.jsx` logic with **0.00px visual shift**, regardless of method selected.
