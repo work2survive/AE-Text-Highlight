@@ -1,4 +1,4 @@
-# AE Text Highlight (v2.2.1)
+# AE Text Highlight (v2.2.2)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -7,14 +7,16 @@
 
 **Live Demo**: [https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 
-**AE Text Highlight v2.2.1** is an advanced procedural typography highlighting and rigging engine for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/). It features a top-level engine selector allowing users to choose between two distinct highlight strategies:
+**AE Text Highlight v2.2.2** is an advanced procedural typography highlighting and rigging engine for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/). It features a top-level engine selector allowing users to choose between two distinct highlight strategies:
 1. **Split Method (Layer Decomposition)**: Decomposes target lines and words into independent text boxes with top-left anchor points, offering individual text layer control, separate text color assignments, and sub-pixel alignment.
 2. **Calculation Method (Intact Text Box)**: Keeps the original text layer completely intact without splitting, calculating the exact geometric coordinates and bounding sizes of highlight boxes in-place using all available typography parameters (`fontSize`, `leading`, `tracking`, `boxTextPos`, `sourceRectAtTime`, and delimiter-anchored advance).
 
 > [!IMPORTANT]
-> **Key Enhancements in v2.2.1**:
-> - **Native After Effects Text Layer Detection Fix**: Fixed a critical bug where `isTextLayer(layer)` erroneously rejected native AE `TextLayer` instances because their underlying ExtendScript `matchName` is `"ADBE AV Layer"` (an `AVLayer` subclass). Replaced with canonical property fingerprinting (`layer.property("ADBE Text Properties") !== null || layer.property("Source Text") !== null`) matching `AE_Align_Anchor_Point.jsx`.
-> - **Active Composition Resolver**: Added fallback scanning across `app.project.items` for active comps with selected layers when `app.project.activeItem` is temporarily unset or pointing to a folder item (common when focus is inside a floating ScriptUI panel).
+> **Key Enhancements in v2.2.2**:
+> - **Smart Text Layer Resolver (Matches AE Align Anchor Point)**: When no text layer is actively selected (e.g. Focus is on a ScriptUI panel, or layer selection was dropped), `getSelectedTextLayer` automatically scans `comp.layers` to identify and target existing text layers without forcing the user to manually re-select or blocking them with alert popups.
+> - **Auto-Create Dummy Text Box Fallback**: If the composition has no text layers (or is completely empty), clicking "Build Highlights" or launching in an empty comp automatically creates a centered dummy text box (`createDummyTextBox(comp)`) and aligns it, exactly mirroring `AE Align Anchor Point` behavior and eliminating blocking alert popups.
+> - **Native After Effects Text Layer Detection (v2.2.1)**: Canonical property fingerprinting (`layer.property("ADBE Text Properties") !== null || layer.property("Source Text") !== null` and `layer instanceof TextLayer`) matching `AE_Align_Anchor_Point.jsx`.
+> - **Active Composition Resolver**: Fallback scanning across `app.project.items` for active comps with selected layers when `app.project.activeItem` is temporarily unset or pointing to a folder item.
 > - **Configurable Target Separator Engine (v2.2.0)**: Separator dropdown supporting `↵ Newline (1 per line)`, `| Pipe ( | )`, `; Semicolon ( ; )`, `, Comma (legacy)`, and `Custom...`.
 > - **Sentences with Commas 100% Preserved**: Highlights full multi-word sentences and clauses containing internal commas (e.g. `"Slow living, peace of mind, body, and soul"`) without unwanted fragment splitting.
 > - **One-Click Delimiter Action Buttons**: Added `+ ↵ Line`, `+ | Pipe`, and `+ Add Separator` buttons right above the targets textarea for instant delimiter insertion at the cursor.
