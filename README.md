@@ -1,4 +1,4 @@
-# AE Text Highlight (v3.0.0)
+# AE Text Highlight (v3.0.1)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -7,24 +7,28 @@
 
 **Live Demo**: [https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 
-**AE Text Highlight v3.0.0** is a streamlined, lightweight procedural typography highlighter for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/).
+**AE Text Highlight v3.0.1** is a streamlined, lightweight procedural typography highlighter for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/).
 
 Completely rewritten from the ground up for maximum simplicity, predictability, and 100% deterministic consistency.
 
 ---
 
-## 🎯 Key Design Innovations (v3.0.0 Ground-Up Rewrite)
+## 🎯 Key Design Innovations (v3.0.1)
 
 1. **100% Idempotent & Deterministic**:
    - Re-running the script on a text layer cleans up and replaces previous highlights in-place.
    - Zero duplicated, stacked, or orphaned layers.
-   - Deterministic target matching: never picks random words or unpredictable samples.
+   - Deterministic target matching on build.
 
-2. **Zero Premature Layer Creation**:
+2. **Contextual Sample Targets Picker (v3.0.1)**:
+   - Clicking **"Sample Targets"** dynamically inspects the currently selected text layer and picks 2-3 random distinct words directly from its source text.
+   - Clean fallback to default sample targets when no layer is selected.
+
+3. **Zero Premature Layer Creation**:
    - Zero layers or helper items are created on panel launch, window focus, or selection polling.
    - Layers are created **strictly and only** when the user clicks **"✨ Build Highlights"**.
 
-3. **Untouched Original Text Layer**:
+4. **Untouched Original Text Layer**:
    - The original text layer's anchor point, position, scale, and rotation are **never modified**.
    - The procedural highlight Shape Layer is parented directly to the text layer and compensates internally for the parent's anchor point `[curAx, curAy]`.
 
