@@ -1,4 +1,4 @@
-# AE Text Highlight (v2.2.2)
+# AE Text Highlight (v2.2.3)
 
 [![Live Browser Simulator](https://img.shields.io/badge/Live%20Demo-AE%20ScriptUI%20Simulator-2c8cff?style=for-the-badge&logo=javascript)](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
@@ -7,22 +7,22 @@
 
 **Live Demo**: [https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true](https://work2survive.github.io/AE_JS_builder/?jsx=AE_Text_Highlight.jsx&autobuild=true)
 
-**AE Text Highlight v2.2.2** is an advanced procedural typography highlighting and rigging engine for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/). It features a top-level engine selector allowing users to choose between two distinct highlight strategies:
+**AE Text Highlight v2.2.3** is an advanced procedural typography highlighting and rigging engine for Adobe After Effects ScriptUI and the [AE JS & ScriptUI Simulator](https://work2survive.github.io/AE_JS_builder/). It features a top-level engine selector allowing users to choose between two distinct highlight strategies:
 1. **Split Method (Layer Decomposition)**: Decomposes target lines and words into independent text boxes with top-left anchor points, offering individual text layer control, separate text color assignments, and sub-pixel alignment.
 2. **Calculation Method (Intact Text Box)**: Keeps the original text layer completely intact without splitting, calculating the exact geometric coordinates and bounding sizes of highlight boxes in-place using all available typography parameters (`fontSize`, `leading`, `tracking`, `boxTextPos`, `sourceRectAtTime`, and delimiter-anchored advance).
 
 > [!IMPORTANT]
-> **Key Enhancements in v2.2.2**:
-> - **Smart Text Layer Resolver (Matches AE Align Anchor Point)**: When no text layer is actively selected (e.g. Focus is on a ScriptUI panel, or layer selection was dropped), `getSelectedTextLayer` automatically scans `comp.layers` to identify and target existing text layers without forcing the user to manually re-select or blocking them with alert popups.
-> - **Auto-Create Dummy Text Box Fallback**: If the composition has no text layers (or is completely empty), clicking "Build Highlights" or launching in an empty comp automatically creates a centered dummy text box (`createDummyTextBox(comp)`) and aligns it, exactly mirroring `AE Align Anchor Point` behavior and eliminating blocking alert popups.
+> **Key Enhancements in v2.2.3**:
+> - **Zero Premature Layer Creation**: Completely removed unwanted dummy text layer creation on script startup, dropdown method switching, panel focus, and selection status polling. No layers are created until the user explicitly clicks 'Build Highlights'.
+> - **Precise Calculation Method Placement**: Fixed vertical displacement bug where Line 0 highlights appeared over Line 1. Highlights now anchor directly to the first line's actual glyph top (`sRect.top`) and properly compensate for the parent layer's anchor point `[curAx, curAy]`.
+> - **Fixed Split Method Text Box Misplacement**: Stopped mutating the original text layer's anchor point and position. Split child layers and vector highlight shapes are now offset by `[curAx, curAy]`, keeping all text completely anchored in place with zero visual jumping.
+> - **Smart Text Layer Resolver (v2.2.2)**: When no text layer is actively selected (e.g. Focus is on a ScriptUI panel, or layer selection was dropped), `getSelectedTextLayer` automatically scans `comp.layers` to identify and target existing text layers without forcing the user to manually re-select or blocking them with alert popups.
+> - **Auto-Create Dummy Text Box Fallback**: If the composition has no text layers (or is completely empty), clicking "Build Highlights" automatically creates a centered dummy text box (`createDummyTextBox(comp)`).
 > - **Native After Effects Text Layer Detection (v2.2.1)**: Canonical property fingerprinting (`layer.property("ADBE Text Properties") !== null || layer.property("Source Text") !== null` and `layer instanceof TextLayer`) matching `AE_Align_Anchor_Point.jsx`.
 > - **Active Composition Resolver**: Fallback scanning across `app.project.items` for active comps with selected layers when `app.project.activeItem` is temporarily unset or pointing to a folder item.
 > - **Configurable Target Separator Engine (v2.2.0)**: Separator dropdown supporting `↵ Newline (1 per line)`, `| Pipe ( | )`, `; Semicolon ( ; )`, `, Comma (legacy)`, and `Custom...`.
 > - **Sentences with Commas 100% Preserved**: Highlights full multi-word sentences and clauses containing internal commas (e.g. `"Slow living, peace of mind, body, and soul"`) without unwanted fragment splitting.
 > - **One-Click Delimiter Action Buttons**: Added `+ ↵ Line`, `+ | Pipe`, and `+ Add Separator` buttons right above the targets textarea for instant delimiter insertion at the cursor.
-> - **Robust Text Layer Selection**: Added parent hierarchy traversal so selecting child indicator/helper layers (e.g., Anchor Cross created in simulators) seamlessly resolves to the parent text layer.
-> - **Unified Footer UI**: Moved GitHub repository link to bottom panel footer matching `AE_Text_Precomp.jsx` styling.
-> - **Mandatory First-Action Anchor Alignment**: Always aligns the text layer anchor point to **Top-Left** using `AE_Align_Anchor_Point.jsx` logic with **0.00px visual shift**, regardless of method selected.
 > - **Selective Highlight Text Coloring**: Highlight box fill strictly changes only the color of the font related to highlights (via Range Selectors in Calculation Method and segment targets in Split Method). Non-highlighted text retains original font color.
 
 ---
